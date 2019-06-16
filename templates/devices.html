@@ -1,0 +1,255 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Devices</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav mr-auto">
+
+            <a class="nav-link" href="/saveDev">Devices</a>
+
+            <a class="nav-link" href="/saveCloud">Clouds</a>
+
+            <a class="nav-link" href="/saveCoordinates">Polling</a>
+
+        </ul>
+        <span class="navbar-text">
+          Configure SNMP Device Profiles
+        </span>
+      </div>
+    </nav>
+
+    <div class="container">
+    <br />
+        <h4>Configure SNMP Devices</h4>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">IP Address</th>
+              <th scope="col">Port</th>
+              <th scope="col">Ping</th>
+              <th scope="col">Action</th>
+              <th scope="col">Socket Bind</th>
+
+            </tr>
+          </thead>
+          <tbody id="deviceTable">
+            <tr id="control">
+              <td> <input type="text" id="devName" class="form-control" placeholder="Give this device a Name"></td>
+              <td> <input type="text" id="devIp" class="form-control" placeholder="Enter IP Address"></td>
+              <td> <input type="text" id="devPort" class="form-control" placeholder="Enter a Port"></td>
+              <th><button type="button" class="btn btn-outline-secondary" disabled>Ping</button></th>
+              <th><button type="button" id="addDev" class="btn btn-outline-success">Create</button></th>
+              <th>Unattempted</th>
+            </tr>
+
+            {% for x in devices %}
+              
+              <tr id='{{ x.addr }}a{{ x.port }}'>
+                  <td>{{ x.name }} </td>
+                  <td>{{ x.addr }}</td>
+                  <td>{{ x.port }} </td>
+                  <td><button type="button" onclick="ping(this, '{{ x.addr }}' , '{{ x.port }}')" id="ping" class="btn btn-outline-warning">Ping</button></td>
+
+                  <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button">Delete</button></td>
+                  <td id="ping{{ x.addr }}-{{ x.port }}">Unattempted</td>
+              </tr>
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col text-center"> 
+            <button type="button" class="btn btn-outline-warning float-center col-6" id="saveCfg">Save All Configured Devices</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="errEnc">
+      <div class="toast-header">
+        <strong class="mr-auto">Error!</strong>
+        <small class="text-muted"></small>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="toast-body" id="toastContent">
+      </div>
+    </div>
+
+      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="succ">
+          <div class="toast-header">
+              <strong class="mr-auto">Success!</strong>
+              <small class="text-muted"></small>
+              <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="toast-body" id="successContent">
+          </div>
+      </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script>
+
+        $('.toast').toast({delay: 10000});
+
+        $("#saveCfg").click(function () {
+            var objCfg = [];
+            $('#deviceTable tr').each(function (i, row) {
+                if (i == 0) {
+                    return; //Continue
+                }
+                //var $row = $(row[0]);
+                var ip;
+                var port;
+                var name;
+                $(row).children("td").each(function (i, col) {
+                    switch (i) {
+                        case 0:
+                            name = $(col).text();
+                            break;
+                        case 1:
+                            ip = $(col).text();
+                            break;
+                        case 2:
+                            port = $(col).text();
+                            break;
+                        default:
+                            break;
+                    }
+                });
+                var row = { id: i, name: name, ip: ip, port: port };
+                objCfg.push(row);
+            });
+
+            //console.log(objCfg);
+
+            $.ajax({
+                type: 'POST',
+                url: '/saveDev',
+                data: JSON.stringify(objCfg),
+                success: function (data) {
+                    $("#saveCfg").removeClass("btn-outline-warning");
+                    $("#saveCfg").addClass("btn-success");
+                    $("#successContent").html("All Configuration Successfully Saved.");
+                    $('#succ').toast('show');
+                },
+                contentType: "application/json",
+                dataType: 'json'
+            });
+
+        });
+
+        $("#addDev").click(function () {
+
+            var count = $('#deviceTable tr').length;
+
+            if (count > 15) {
+                $("#toastContent").html("A Maximum of 15 SNMP Devices is Supported.");
+                $('#errEnc').toast('show');
+                return;
+            }
+
+            var devName = $("#devName").val();
+
+            var ip = $("#devIp").val();
+            var port = $("#devPort").val();
+
+            var table = $("#deviceTable");
+
+            if (!validateIPaddress(ip)) {
+                $("#toastContent").html("A Invalid IP Address has been Detected!");
+                $('#errEnc').toast('show');
+                return;
+            }
+
+            if (parseInt(port) < 1 || parseInt(port) > 65535 || isNaN(port)) {
+                $("#toastContent").html("A Invalid Port Number has been Detected!");
+                $('#errEnc').toast('show');
+                return;
+            }
+
+            var elem = document.getElementById(ip+'a'+port);
+
+            if (elem != null) {
+                $("#toastContent").html("A Duplicate Entry has been Detected!");
+                $('#errEnc').toast('show');
+                return;
+            }
+
+
+            table.append('<tr id=' + ip + 'a' + port + '><td>' + devName + '</td><td>' + ip + ' </td><td>' + port + ' </td><td><button type="button" onclick="ping(this,' + "'" + ip + "'" + ",'" + port + "'" + ')" id="ping" class="btn btn-outline-warning">Ping</button></td><td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button">Delete</button></td><td id="ping'+ip+'-'+port+'">Unattempted</td></tr>');
+            $("#saveCfg").addClass("btn-outline-warning");
+            $("#saveCfg").removeClass("btn-success");
+
+        });
+
+        function deleteMe(elem) {
+            $(elem).closest('tr').get(0).remove();
+            $("#saveCfg").addClass("btn-outline-warning");
+            $("#saveCfg").removeClass("btn-success");
+        }
+
+        function ping(elem, ip, port) {
+
+            var row = {ip: ip.trim(), port: port.trim()};
+            document.getElementById("ping" + ip + "-" + port).innerHTML = "Trying...";
+            $.ajax({
+                type: 'POST',
+                url: '/ping',
+                data: JSON.stringify(row),
+                success: function (data) {
+                    console.log(data.success);
+                    if (data.success) {
+                        $(elem).removeClass("btn-outline-warning");
+                        $(elem).addClass("btn-success");
+                        $("#successContent").html("Ping Successful");
+                        $('#succ').toast('show');
+                        document.getElementById("ping" + ip + "-" + port).innerHTML = "Succeeded!";
+                        //$("#ping" + ip + "-" + port).html("Reachable");
+                    } else {
+                        $(elem).removeClass("btn-outline-warning");
+                        $(elem).addClass("btn-danger");
+                        $("#toastContent").html("IP Address " + ip + " Could Not Be Reached!");
+                        $('#errEnc').toast('show');
+                        document.getElementById("ping" + ip + "-" + port).innerHTML = "Failed!";
+                        //$("#ping" + ip + "-" + port).html("Failed"); <- Why doesn't this work?
+                    }
+                },
+                contentType: "application/json",
+                dataType: 'json'
+            });
+
+        }
+
+        function validateIPaddress(ipaddress) {
+            if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {
+                return (true)
+            }
+            return (false)
+        }
+
+    </script>
+  </body>

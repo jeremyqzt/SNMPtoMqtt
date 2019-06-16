@@ -1,0 +1,238 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Devices</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+
+            <a class="nav-link" href="/saveDev">Devices</a>
+
+            <a class="nav-link" href="/saveCloud">Clouds</a>
+
+            <a class="nav-link" href="/saveCoordinates">Polling</a>
+
+            </ul>
+            <span class="navbar-text">
+                Configure Polling
+            </span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <br />
+        <h4>Configure Polling</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">OID</th>
+                    <th scope="col">Operation</th>
+                    <th scope="col">Device</th>
+                    <th scope="col">Topic</th>
+                    <th scope="col">Interval</th>
+                    <th scope="col">Action</th>
+
+                </tr>
+            </thead>
+            <tbody id="coordinatesTable">
+                <tr id="control">
+                    <td> <input type="text" id="OID" class="form-control" placeholder="Enter a OID"></td>
+                    <td>
+                        <select class="form-control" id="snmpOper">
+                            <option value="Get">Get</option>
+                            <option value="Get-Next">GetNext</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control">
+                            {% for x in devices %}
+                                <option id ="ipAddr" value = "{{ x.name }}">{{ x.addr }}({{ x.name  }})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td> <div class="form-row align-items-center"><input type="text" id="topic" class="form-control" placeholder="Set a Topic"></div></td>
+                    <td> <div class="form-row align-items-center"><input type="text" id="interval" class="form-control" value="1H30M"></div></td>
+                    <th><button type="button" id="addDev" class="btn btn-outline-success">Create</button></th>
+
+                </tr>
+
+                {% for y in coordinates %}
+                <tr>
+                    <td> {{ y.oid }}</td>
+                    <td> {{ y.snmpOper }}</td>
+                    <td> {{ y.devName }}</td>
+                    <td> {{ y.topic }}</td>
+                    <td> {{ y.interval }}</td>
+                    <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button">Delete</button></td>
+
+                </tr>
+                {% endfor %}
+
+
+        </table>
+
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col text-center">
+                <button type="button" class="btn btn-outline-warning float-center col-5" id="polling">Start Polling</button>
+                &nbsp;
+                <button type="button" class="btn btn-outline-warning float-center col-5" id="saveCfg">Save All Coordinates</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="errEnc">
+        <div class="toast-header">
+            <strong class="mr-auto">Error!</strong>
+            <small class="text-muted"></small>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body" id="toastContent">
+        </div>
+    </div>
+
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="succ">
+        <div class="toast-header">
+            <strong class="mr-auto">Success!</strong>
+            <small class="text-muted"></small>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body" id="successContent">
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script>
+
+        $('.toast').toast({delay: 10000});
+
+        $("#saveCfg").click(function () {
+            var objCfg = [];
+            $('#coordinatesTable tr').each(function (i, row) {
+                if (i == 0) {
+                    return; //Continue
+                }
+
+                $(row).children("td").each(function (i, col) {
+                    switch (i) {
+                        case 0:
+                            oid = $(col).text();
+                            break;
+                        case 1:
+                            oper = $(col).text();
+                            break;
+                        case 2:
+                            name = $(col).text();
+                            break;
+                        case 3:
+                            topic = $(col).text();
+                            break;
+                        case 4:
+                            interval = $(col).text();
+                            break;
+                        default:
+                            break;
+                    }
+                });
+                var row = { oid: oid, oper:oper, name: name, topic: topic, interval: interval };
+                objCfg.push(row);
+            });
+
+            console.log(objCfg);
+
+            $.ajax({
+                type: 'POST',
+                url: '/saveCoordinates',
+                data: JSON.stringify(objCfg),
+                success: function (data) {
+                    $("#saveCfg").removeClass("btn-outline-warning");
+                    $("#saveCfg").addClass("btn-success");
+                    $("#successContent").html("All Configuration Successfully Saved.");
+                    $('#succ').toast('show');
+                },
+                contentType: "application/json",
+                dataType: 'json'
+            });
+
+        });
+
+        $("#polling").click(function () {
+            var objCfg = [];
+            var action = { action: "start" };
+            objCfg.push(action);
+
+
+            console.log(objCfg);
+
+            $.ajax({
+                type: 'POST',
+                url: '/start',
+                data: JSON.stringify(objCfg),
+                success: function (data) {
+                    $("#polling").removeClass("btn-outline-warning");
+                    $("#polling").addClass("btn-success");
+                    $("#successContent").html("Polling Started.");
+                    $('#succ').toast('show');
+                },
+                contentType: "application/json",
+                dataType: 'json'
+            });
+        });
+
+
+        $("#addDev").click(function () {
+            var table = $("#coordinatesTable");
+
+            var OID = $("#OID").val(); //snmpOper
+            var oper = $("#snmpOper").val();
+            var ip = $("#ipAddr").val();
+            var topic = $("#topic").val();
+            var interval = $("#interval").val();
+
+            table.append('<tr><td>' + OID + '</td><td>' + oper + ' </td><td>' + ip + ' </td><td>' + topic +'</td><td>' + interval +'</td><td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button">Delete</button></td></tr>');
+            $("#saveCfg").addClass("btn-outline-warning");
+            $("#saveCfg").removeClass("btn-success");
+
+        });
+
+        function deleteMe(elem) {
+            $(elem).closest('tr').get(0).remove();
+            $("#saveCfg").addClass("btn-outline-warning");
+            $("#saveCfg").removeClass("btn-success");
+        }
+        
+        function checkOID() {
+            //Return True for now
+            return true;
+        }
+        
+        function checkinterval(interval){
+            return !isNaN(interval);
+        }
+
+    </script>
+
+</body>

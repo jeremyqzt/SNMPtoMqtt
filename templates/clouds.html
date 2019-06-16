@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Cloud Profile</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav mr-auto">
+
+            <a class="nav-link" href="/saveDev">Devices</a>
+
+            <a class="nav-link" href="/saveCloud">Clouds</a>
+
+            <a class="nav-link" href="/saveCoordinates">Polling</a>
+
+        </ul>
+        <span class="navbar-text">
+          Configure SNMP Device Profiles
+        </span>
+      </div>
+    </nav>
+
+    <div class="container">
+    <br />
+        <h4>Configure a Cloud Profile</h4>
+            <form>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="cloudAddr">Broker Address</label>
+                  <input class="form-control" id="cloudAddr" placeholder="Broker Address" {% if cloud[0] is defined %} value="{{ cloud[0].addr }}" {% endif %}>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="cloudPort">Broker Port</label>
+                  <input class="form-control" id="cloudPort" type="number"  data-bind="value:replyNumber" placeholder="Broker Port" {% if cloud[0] is defined %} value="{{ cloud[0].port }}" {% endif %}>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="clienId">Client ID</label>
+                  <input class="form-control" id="clienId" placeholder="Enter an Client ID" {% if cloud[0] is defined %} value="{{ cloud[0].clientId }}" {% endif %}>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="keepAlive">Keep Alive Interval (Seconds)</label>
+                  <input class="form-control" id="keepAlive" placeholder="Enter a Interval (s)" {% if cloud[0] is defined %} value="{{ cloud[0].keepAlive }}" {% endif %}>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="user">Username</label>
+                  <input class="form-control" id="user" placeholder="Username" {% if cloud[0] is defined %} value="{{ cloud[0].username }}" {% endif %}>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="pass">Password</label>
+                  <input type="password" class="form-control" id="pass" placeholder="Password" {% if cloud[0] is defined %} value="{{ cloud[0].password }}" {% endif %}>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="lastWillTopic">Last Will Topic</label>
+                <input type="text" class="form-control" id="lastWillTopic" placeholder="Enter a Last Will Topic" {% if cloud[0] is defined %} value="{{ cloud[0].lastWillTopic }}" {% endif %}>
+              </div>
+              <div class="form-group">
+                <label for="lastWill">Last Will Message</label>
+                <input type="text" class="form-control" id="lastWillMessage" placeholder="Enter a Last Will Message" {% if cloud[0] is defined %} value="{{ cloud[0].lastWill }}" {% endif %}>
+              </div>
+
+              <br />
+              <div class="container">
+                <div class="row">
+                  <div class="col text-center">
+                      <button type="button" class="btn btn-outline-warning float-center col-5" onclick="pingCloud(this)">Test the Cloud Profile Connection</button>
+                      <span class="col-1"></span>
+                      <button type="button" class="btn btn-outline-warning float-center col-5" type="submit" id="saveCfg">Save Configured Cloud Profile</button>
+                      </div>
+                  </div>
+              </div>
+            </form>
+    </div>
+
+
+
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="errEnc">
+      <div class="toast-header">
+        <strong class="mr-auto">Error!</strong>
+        <small class="text-muted"></small>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="toast-body" id="toastContent">
+      </div>
+    </div>
+
+      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="succ">
+          <div class="toast-header">
+              <strong class="mr-auto">Success!</strong>
+              <small class="text-muted"></small>
+              <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="toast-body" id="successContent">
+          </div>
+      </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script>
+
+        $('.toast').toast({ delay: 10000 });
+
+        $("#saveCfg").click(function () {
+            var cloudAddr = $("#cloudAddr").val();
+            var cloudPort = $("#cloudPort").val();
+            var clientId = $("#clienId").val();
+            var keepAlive = $("#keepAlive").val();
+            var username = $("#user").val();
+            var password = $("#pass").val(); //lastWillTopic
+            var lastWillTopic = $("#lastWillTopic").val();
+            var lastWillMessage = $("#lastWillMessage").val();
+
+            var payload = { cloudAddr: cloudAddr, cloudPort: cloudPort, clientId: clientId, keepAlive: keepAlive
+            , username: username, password: password, lastWillTopic: lastWillTopic, lastWillMessage: lastWillMessage
+            };
+
+            console.log(payload);
+
+            $.ajax({
+                type: 'POST',
+                url: '/saveCloud',
+                data: JSON.stringify(payload),
+                success: function (data) {
+                    $("#saveCfg").removeClass("btn-outline-warning");
+                    $("#saveCfg").addClass("btn-success");
+                    $("#successContent").html("All Configuration Successfully Saved.");
+                    $('#succ').toast('show');
+                },
+                contentType: "application/json",
+                dataType: 'json'
+            });
+
+        });
+
+        function pingCloud(elem) {
+            var cloudAddr = $("#cloudAddr").val();
+            var cloudPort = $("#cloudPort").val();
+            ping(elem, cloudAddr, cloudPort);
+        }
+
+        function ping(elem, ip, port) {
+
+            var row = { ip: ip.trim(), port: port.trim() };
+            //document.getElementById("ping" + ip + "-" + port).innerHTML = "Trying...";
+            $.ajax({
+                type: 'POST',
+                url: '/ping',
+                data: JSON.stringify(row),
+                success: function (data) {
+                    console.log(data.success);
+                    if (data.success) {
+                        $(elem).removeClass("btn-outline-warning");
+                        $(elem).addClass("btn-success");
+                        $("#successContent").html("Ping Successful");
+                        $('#succ').toast('show');
+                    } else {
+                        $(elem).removeClass("btn-outline-warning");
+                        $(elem).addClass("btn-danger");
+                        $("#toastContent").html("IP Address " + ip + " Could Not Be Reached!");
+                    }
+                },
+                contentType: "application/json",
+                dataType: 'json'
+            });
+
+        }
+
+    </script>
+  </body>
