@@ -1,5 +1,4 @@
-from flask import Flask
-from flask import Flask, flash, redirect, render_template, request, session, abort
+from flask import Flask, flash, redirect, render_template, request, session, abort, url_for
 import os
 import json
 import sqlite3
@@ -28,7 +27,7 @@ def home():
    #if not session.get('logged_in'):
    #   return render_template('login.html')
    #else:
-   return render_template('clouds.html')
+   return redirect(url_for('saveDev'))
 
 @app.route('/saveCloud', methods=['POST', 'GET'])
 def saveCloud():
