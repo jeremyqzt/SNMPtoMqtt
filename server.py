@@ -9,9 +9,10 @@ import paho.mqtt.client as paho
 
 runningListCoor = []
 lock = threading.Lock()
+userSession = ""
 
-def ping(ip,port):
-   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+def ping(ip, port):
+   s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
    s.settimeout(1)
    try:
       s.connect((ip, int(port)))
@@ -24,13 +25,16 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-   #if not session.get('logged_in'):
-   #   return render_template('login.html')
-   #else:
-   return redirect(url_for('saveDev'))
+   if not session.get('logged_in'):
+      return render_template('login.html')
+   else:
+      return redirect(url_for('saveDev'))
 
 @app.route('/saveCloud', methods=['POST', 'GET'])
 def saveCloud():
+   if not session.get('logged_in'):
+      return render_template('login.html')
+
    if request.method == 'POST':
       data = request.get_json()
       sql = ' INSERT INTO cloudProfile(addr,port,lastWill,lastWillTopic,username,password,clientId,keepAlive) VALUES(?,?,?,?,?,?,?,?) '
@@ -59,6 +63,9 @@ def saveCloud():
 
 @app.route('/saveDev', methods=['POST', 'GET'])
 def saveDev():
+   if not session.get('logged_in'):
+      return render_template('login.html')
+
    if request.method == 'POST':
       data = request.get_json()
       conn = sqlite3.connect('database.db')
@@ -86,6 +93,9 @@ def saveDev():
 
 @app.route('/saveCoordinates', methods=['POST', 'GET'])
 def saveCoordinates():
+   if not session.get('logged_in'):
+      return render_template('login.html')
+
    if request.method == 'POST':
       data = request.get_json()
       conn = sqlite3.connect('database.db')
@@ -183,12 +193,9 @@ def pingDev():
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
-   if request.form['password'] == 'password' and request.form['username'] == 'admin':
-      session['logged_in'] = True
-      return render_template('devices.html')
-   else:
-      return render_template('login.html', error = 'Login Failed')
-
+   userSession = request.form['username']
+   session['logged_in'] = True
+   return redirect(url_for('saveDev'))
 
 if __name__ == "__main__":
    app.secret_key = os.urandom(12)
