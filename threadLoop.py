@@ -13,7 +13,7 @@ class pollThread (threading.Thread):
     def __init__(self, name, southConfig, northConfig, mqtt):
         threading.Thread.__init__(self)
         self.name = name
-        print(southConfig)
+
         southCfg = json.loads(southConfig) #Attached devices = southbound
         northCfg = json.loads(northConfig) #The Cloud = northbound
 
@@ -43,32 +43,27 @@ class pollThread (threading.Thread):
 
         self.mqttClient = mqtt
 
-        self.lock = threading.Lock()
-        self.startRunning()
+        self.running = True
 
     def run(self):
-        while (True):
-            self.lock.acquire()
-            iShouldDoSomething = self.running
-            self.lock.release()
 
-            if (iShouldDoSomething):
-                self._poll()
-                self._send()
-            else:
-                return
+        while (self.running):
 
-            time.sleep(self.delay)
+            self._poll()
+            self._send()
 
-    def stopRunning(self):
-        self.lock.acquire()
-        self.running = False
-        self.lock.release()
+            for i in range(self.delay):
+                time.sleep(1)
 
-    def startRunning(self):
-        self.lock.acquire()
-        self.running = True
-        self.lock.release()
+                if not self.running:
+                    return
+
+
+    def setRunning(self, newVal):
+        self.running = newVal
+
+    def getRunning(self) -> bool:
+        return self.running
 
     def _poll(self):
         if (self.SnmpOper == "Get"):

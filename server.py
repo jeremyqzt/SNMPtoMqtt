@@ -7,9 +7,20 @@ import threading
 import threadLoop
 import paho.mqtt.client as paho
 
+app = Flask(__name__)
+
 runningListCoor = []
 lock = threading.Lock()
 userSession = ""
+
+def stopAll():
+    for pollThread in runningListCoor:
+        pollThread.setRunning(False)
+
+    for pollThread in runningListCoor:
+        pollThread.join()
+
+    runningListCoor.clear()
 
 def ping(ip, port):
    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -20,8 +31,6 @@ def ping(ip, port):
       return True
    except:
       return False
-
-app = Flask(__name__)
 
 @app.route('/')
 def home():
@@ -97,6 +106,7 @@ def saveCoordinates():
       return render_template('login.html')
 
    if request.method == 'POST':
+      stopAll()
       data = request.get_json()
       conn = sqlite3.connect('database.db')
       conn.execute('DELETE FROM coordinates;')
@@ -111,7 +121,9 @@ def saveCoordinates():
 
       conn.commit()
       conn.close()
+
       return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+
    if request.method == 'GET':
       conn = sqlite3.connect('database.db')
       conn.row_factory = sqlite3.Row
@@ -130,54 +142,53 @@ def saveCoordinates():
 
 @app.route('/start', methods=['POST', 'GET'])
 def engage():
-   if request.method == 'POST':
-      data = request.get_json()
-
-      if (data[0]['action'].strip() == "start"):
-        conn = sqlite3.connect('database.db')
-        conn.row_factory = sqlite3.Row
-        cursor = conn.execute("SELECT * FROM coordinates LEFT JOIN devices WHERE coordinates.devName = devices.name;")
-        rows = cursor.fetchall()
-        coordinates = [dict(ix) for ix in rows]
-        cursor = conn.execute("SELECT * FROM cloudProfile;")
-        rows = cursor.fetchall()
-        cloudResult = [dict(ix) for ix in rows]
-        theCloud = cloudResult[0] #only supporting 1 cloud
-        conn.close()
-
-
-        #TODO: Abstract this 1 level higher
-        mqttClient= paho.Client(theCloud['clientId'])
-
-        if ((theCloud['username']) != "" or (theCloud['password'] != "")):
-            mqttClient.username_pw_set(theCloud['username'], theCloud['password'])
+    if request.method == 'POST':
+        data = request.get_json()
+        if (data[0]['action'].strip() == "start"):
+            conn = sqlite3.connect('database.db')
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("SELECT * FROM coordinates LEFT JOIN devices WHERE coordinates.devName = devices.name;")
+            rows = cursor.fetchall()
+            coordinates = [dict(ix) for ix in rows]
+            cursor = conn.execute("SELECT * FROM cloudProfile;")
+            rows = cursor.fetchall()
+            cloudResult = [dict(ix) for ix in rows]
+            theCloud = cloudResult[0] #only supporting 1 cloud
+            conn.close()
 
 
-        mqttClient.will_set(theCloud['lastWillTopic'], theCloud['lastWill'], 0)
-        mqttClient.connect(theCloud['addr'], int(theCloud['port']), int(theCloud['keepAlive']))
+            #TODO: Abstract this 1 level higher
+            mqttClient= paho.Client(theCloud['clientId'])
 
-        ########END TODO
-        
-        i = 0
-        #Kill Old Threads
-        for pollThread in runningListCoor:
-            pollThread.stopRunning()
+            if ((theCloud['username']) != "" or (theCloud['password'] != "")):
+                mqttClient.username_pw_set(theCloud['username'], theCloud['password'])
 
-        runningListCoor.clear()
 
-        #Start New ones
-        for coordinate in coordinates:
-            print(i)
-            worker = threadLoop.pollThread(str(i), json.dumps(coordinate), json.dumps(theCloud), mqttClient)
-            worker.start()
-            runningListCoor.append(worker)
-            i = i + 1
-        print(runningListCoor)
+            mqttClient.will_set(theCloud['lastWillTopic'], theCloud['lastWill'], 0)
+            mqttClient.connect(theCloud['addr'], int(theCloud['port']), int(theCloud['keepAlive']))
 
-      else:
-        print("got index wrong")
+            ########END TODO
 
-      return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+
+            #Kill Old Threads
+            stopAll()
+
+            i = 0
+            #Start New ones
+            for coordinate in coordinates:
+                worker = threadLoop.pollThread(str(i), json.dumps(coordinate), json.dumps(theCloud), mqttClient)
+                worker.start()
+                runningListCoor.append(worker)
+                i = i + 1
+
+        else:
+            stopAll()
+
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+
+    if request.method == 'GET':
+        pointsLoaded = len(runningListCoor) > 0
+        return json.dumps({'success':True, 'started': pointsLoaded}), 200, {'ContentType':'application/json'}
 
 
 @app.route('/ping', methods=['POST'])

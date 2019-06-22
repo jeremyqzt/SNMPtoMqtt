@@ -126,6 +126,26 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
     <script>
+        $( document ).ready(function() {
+            $.ajax({
+                type: 'GET',
+                url: '/start',
+                success: function (data) {
+                    if (data['started'])
+                    {
+                        $("#polling").removeClass("btn-outline-warning");
+                        $("#polling").addClass("btn-success");
+                    }
+                    else
+                    {
+                        $("#polling").removeClass("btn-success");
+                        $("#polling").addClass("btn-outline-warning");
+                    }
+                },
+                contentType: "application/json",
+                dataType: 'json'
+            });
+        });
 
         $('.toast').toast({delay: 10000});
 
@@ -161,7 +181,6 @@
                 objCfg.push(row);
             });
 
-            console.log(objCfg);
 
             $.ajax({
                 type: 'POST',
@@ -172,6 +191,9 @@
                     $("#saveCfg").addClass("btn-success");
                     $("#successContent").html("All Configuration Successfully Saved.");
                     $('#succ').toast('show');
+                    //Stop polling on save
+                    $("#polling").removeClass("btn-success");
+                    $("#polling").addClass("btn-outline-warning");
                 },
                 contentType: "application/json",
                 dataType: 'json'
@@ -183,8 +205,6 @@
             var objCfg = [];
             var action = { action: "start" };
             objCfg.push(action);
-
-
             console.log(objCfg);
 
             $.ajax({
@@ -192,6 +212,7 @@
                 url: '/start',
                 data: JSON.stringify(objCfg),
                 success: function (data) {
+                    console.log(data)
                     $("#polling").removeClass("btn-outline-warning");
                     $("#polling").addClass("btn-success");
                     $("#successContent").html("Polling Started.");
