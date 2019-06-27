@@ -1,2 +1,4 @@
 *.db
 __*
+certs
+certs/*
