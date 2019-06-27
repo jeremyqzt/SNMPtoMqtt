@@ -6,6 +6,7 @@ import socket
 import threading
 import threadLoop
 import paho.mqtt.client as paho
+from werkzeug import secure_filename
 
 app = Flask(__name__)
 
@@ -68,6 +69,21 @@ def saveCloud():
          return render_template('clouds.html', cloud=cloudData)
       else:
          return render_template('clouds.html', cloud=[])
+
+
+@app.route('/upload', methods=['POST', 'GET'])
+def upload():
+   if not session.get('logged_in'):
+      return render_template('login.html')
+
+   if request.method == 'POST':
+      f = request.files['file']
+      f.save("certs/" + secure_filename(f.filename))
+      return render_template('upload.html', files=[])
+
+   if request.method == 'GET':
+      return render_template('upload.html', files=[])
+
 
 
 @app.route('/saveDev', methods=['POST', 'GET'])
@@ -222,5 +238,7 @@ if __name__ == "__main__":
                 "snmpOper TEXT, topic TEXT, interval TEXT);")
    conn.commit()
    conn.close()
-
+   
+   if not os.path.exists("certs"):
+      os.mkdir("certs")
    app.run(debug=True,host='0.0.0.0', port=4000)
