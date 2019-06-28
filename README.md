@@ -9,9 +9,8 @@ to run, you'll need
 apt-get install python3.5
 
 #python packages
-pip install flask
-pip install pysnmp
-pip install paho-mqtt
+pip install -r requirements.txt
+
 ```
 ### run the application on localhost:4000
 ```
