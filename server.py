@@ -1,5 +1,6 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort, url_for
 import os
+from os.path import isfile, join
 import json
 import sqlite3
 import socket
@@ -8,6 +9,7 @@ import threadLoop
 import paho.mqtt.client as paho
 from werkzeug import secure_filename
 
+certPath = "certs"
 app = Flask(__name__)
 
 runningListCoor = []
@@ -76,9 +78,13 @@ def upload():
    if not session.get('logged_in'):
       return render_template('login.html')
 
+
+   onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
+
+   print (onlyfiles)
    if request.method == 'POST':
       f = request.files['file']
-      f.save("certs/" + secure_filename(f.filename))
+      f.save(certPath + "/" + secure_filename(f.filename))
       return render_template('upload.html', files=[])
 
    if request.method == 'GET':
@@ -239,6 +245,6 @@ if __name__ == "__main__":
    conn.commit()
    conn.close()
    
-   if not os.path.exists("certs"):
-      os.mkdir("certs")
+   if not os.path.exists(certPath):
+      os.mkdir(certPath)
    app.run(debug=True,host='0.0.0.0', port=4000)
