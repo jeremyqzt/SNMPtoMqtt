@@ -42,6 +42,21 @@ def home():
    else:
       return redirect(url_for('saveDev'))
 
+
+@app.route('/deleteFile', methods=['POST'])
+def delete():
+   if not session.get('logged_in'):
+      return render_template('login.html')
+
+   if request.method == 'POST':
+      data = request.get_json()
+      if not '/' in data:
+         os.remove(certPath + "/" + data.strip('"'))
+         onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
+
+   return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+
+
 @app.route('/saveCloud', methods=['POST', 'GET'])
 def saveCloud():
    if not session.get('logged_in'):
@@ -78,17 +93,15 @@ def upload():
    if not session.get('logged_in'):
       return render_template('login.html')
 
-
-   onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
-
-   print (onlyfiles)
    if request.method == 'POST':
       f = request.files['file']
       f.save(certPath + "/" + secure_filename(f.filename))
-      return render_template('upload.html', files=[])
+      onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
+      return redirect(url_for('upload'))
 
    if request.method == 'GET':
-      return render_template('upload.html', files=[])
+      onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
+      return render_template('upload.html', files=map(json.dumps, onlyfiles))
 
 
 

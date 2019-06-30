@@ -45,6 +45,12 @@
             </tr>
           </thead>
           <tbody id="filesTable">
+          {% for item in files %}
+            <tr>
+              <td>{{ item }}</td>
+              <td><button type="button" onclick="deleteFile('{{ item }}')" class="btn btn-outline-danger">Delete</button></td>
+            </tr>
+          {% endfor %}
           </tbody>
         </table>
     </div>
@@ -74,12 +80,20 @@
     <script>
 
 
-        function deleteMe(elem) {
-            $(elem).closest('tr').get(0).remove();
-            $("#saveCfg").addClass("btn-outline-warning");
-            $("#saveCfg").removeClass("btn-success");
-        }
-
+      function deleteFile(toDelete) {
+        console.log(toDelete);
+        $.ajax({
+          type: 'POST',
+          url: '/deleteFile',
+          data: JSON.stringify(toDelete),
+          success: function (data) {
+            console.log(data);
+            window.location.href = '/upload';
+          },
+          contentType: "application/json",
+          dataType: 'json'
+        });
+      }
 
     </script>
   </body>
