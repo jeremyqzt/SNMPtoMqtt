@@ -80,10 +80,12 @@ def saveCloud():
       cursor = conn.execute("SELECT * FROM cloudProfile;")
       rows = cursor.fetchall()
       cloudData = [dict(ix) for ix in rows]
+      onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
+
       print(cloudData)
       conn.close()
       if (cloudData):
-         return render_template('clouds.html', cloud=cloudData)
+         return render_template('clouds.html', cloud=cloudData, files=map(json.dumps, onlyfiles), filesCa=map(json.dumps, onlyfiles))
       else:
          return render_template('clouds.html', cloud=[])
 
