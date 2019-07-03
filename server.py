@@ -64,12 +64,13 @@ def saveCloud():
 
    if request.method == 'POST':
       data = request.get_json()
-      sql = ' INSERT INTO cloudProfile(addr,port,lastWill,lastWillTopic,username,password,clientId,keepAlive) VALUES(?,?,?,?,?,?,?,?) '
+      sql = ' INSERT INTO cloudProfile(addr,port,lastWill,lastWillTopic,username,password,clientId,keepAlive, clientKey, caFile) VALUES(?,?,?,?,?,?,?,?,?,?) '
       conn = sqlite3.connect('database.db')
       conn.execute('DELETE FROM cloudProfile;')
       conn.commit()
+      print(data)
       conn.execute(sql, (data['cloudAddr'], data['cloudPort'], data['lastWillMessage'], data['lastWillTopic'],
-                         data['username'],data['password'], data['clientId'],data['keepAlive']))
+                         data['username'],data['password'], data['clientId'],data['keepAlive'], data['privKey'],data['caCert']))
 
       conn.commit()
       return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
@@ -81,13 +82,13 @@ def saveCloud():
       rows = cursor.fetchall()
       cloudData = [dict(ix) for ix in rows]
       onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
-
-      print(cloudData)
+      print(onlyfiles)
+      
       conn.close()
       if (cloudData):
          return render_template('clouds.html', cloud=cloudData, files=map(json.dumps, onlyfiles), filesCa=map(json.dumps, onlyfiles))
       else:
-         return render_template('clouds.html', cloud=[])
+         return render_template('clouds.html', cloud=[], files=map(json.dumps, onlyfiles), filesCa=map(json.dumps, onlyfiles))
 
 
 @app.route('/upload', methods=['POST', 'GET'])
@@ -102,7 +103,9 @@ def upload():
       return redirect(url_for('upload'))
 
    if request.method == 'GET':
+
       onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
+      print(onlyfiles)
       return render_template('upload.html', files=map(json.dumps, onlyfiles))
 
 
@@ -252,7 +255,7 @@ if __name__ == "__main__":
 
    conn.execute("CREATE TABLE IF NOT EXISTS cloudProfile (addr TEXT, port TEXT,"
                 "lastWill TEXT, lastWillTopic TEXT, username TEXT, password TEXT,"
-                "caFile TEXT, clientKey TEXT, clientCert TEXT, clientId TEXT, keepAlive TEXT);")
+                "caFile TEXT, clientKey TEXT, clientId TEXT, keepAlive TEXT);")
 
 
    conn.execute("CREATE TABLE IF NOT EXISTS coordinates (oid TEXT, devName TEXT,"

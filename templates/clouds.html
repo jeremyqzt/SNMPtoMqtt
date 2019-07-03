@@ -71,7 +71,7 @@
                         <select class="form-control">
                             <option selected value> -- select an option -- </option>
                             {% for item in files %}
-                                <option id ="privKey" value = "{{ item }}">{{ item }}</option>
+                                <option id ="privKey" value = {{ item | replace('"', '')}}>{{ item | replace('"', '') }}</option>
                             {% endfor %}
                         </select>
                 </div>
@@ -80,7 +80,7 @@
                         <select class="form-control">
                             <option selected value> -- select an option -- </option>
                             {% for ca in filesCa %}
-                                <option id ="caCert" value = "{{ ca }}">{{ ca }}</option>
+                                <option id ="caCert" value = {{ ca | replace('"', '')}}>{{ ca | replace('"', '') }}</option>
                             {% endfor %}
                         </select>
                 </div>
@@ -152,9 +152,12 @@
             var password = $("#pass").val(); //lastWillTopic
             var lastWillTopic = $("#lastWillTopic").val();
             var lastWillMessage = $("#lastWillMessage").val();
+            var privKey = $("#privKey").val();
+            var caCert = $("#caCert").val();
 
             var payload = { cloudAddr: cloudAddr, cloudPort: cloudPort, clientId: clientId, keepAlive: keepAlive
             , username: username, password: password, lastWillTopic: lastWillTopic, lastWillMessage: lastWillMessage
+            , caCert: caCert, privKey: privKey
             };
 
             console.log(payload);
