@@ -66,25 +66,45 @@
                 </div>
               </div>
               <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label for="privKey">Private Key</label>
-                        <select class="form-control">
-                            <option selected value> -- select an option -- </option>
+                <div class="form-group col-md-5">
+                  <label for="files">Files</label>
+                        <select class="form-control" id="files">
+                            <option selected value> None </option>
                             {% for item in files %}
                                 <option id ="privKey" value = {{ item | replace('"', '')}}>{{ item | replace('"', '') }}</option>
                             {% endfor %}
                         </select>
                 </div>
-                <div class="form-group col-md-6">
-                  <label for="caCert">Ca Cert</label>
-                        <select class="form-control">
+                <div class="form-group col-md-5">
+                  <label for="CertType">Designation</label>
+                        <select class="form-control" id="CertType">
                             <option selected value> -- select an option -- </option>
-                            {% for ca in filesCa %}
-                                <option id ="caCert" value = {{ ca | replace('"', '')}}>{{ ca | replace('"', '') }}</option>
-                            {% endfor %}
+                            <option value>CA Certificate</option>
+                            <option value>Client Key</option>
+                            <option value>Client Certificate</option>
                         </select>
                 </div>
+                <div class="form-group col-md-2">
+                  <label for="addBtn">&nbsp</label>
+                  <button id = "addBtn" type="button" class="btn btn-outline-success col-md-12 " onclick="SetCert()">Add</button>
+                </div>
               </div>
+
+              <div class="row">
+                <div class="col-md-4">
+                  <label>Selected CA</label><br/>
+                  <p>-- None --</p>
+                </div>
+                <div class="col-md-4">
+                  <label>Selected Client Key</label><br/>
+                  <p>-- None --</p>
+                </div>
+                <div class="col-md-4">
+                  <label>Selected Client Cert</label><br/>
+                  <p>-- None --</p>
+                </div>
+              </div>
+
               <div class="form-group">
                 <label for="lastWillTopic">Last Will Topic</label>
                 <input type="text" class="form-control" id="lastWillTopic" placeholder="Enter a Last Will Topic" {% if cloud[0] is defined %} value="{{ cloud[0].lastWillTopic }}" {% endif %}>

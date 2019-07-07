@@ -88,7 +88,7 @@ def saveCloud():
       if (cloudData):
          return render_template('clouds.html', cloud=cloudData, files=map(json.dumps, onlyfiles), filesCa=map(json.dumps, onlyfiles))
       else:
-         return render_template('clouds.html', cloud=[], files=map(json.dumps, onlyfiles), filesCa=map(json.dumps, onlyfiles))
+         return render_template('clouds.html', cloud=[], files=map(json.dumps, onlyfiles))
 
 
 @app.route('/upload', methods=['POST', 'GET'])
