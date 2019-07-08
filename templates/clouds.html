@@ -69,39 +69,39 @@
                 <div class="form-group col-md-5">
                   <label for="files">Files</label>
                         <select class="form-control" id="files">
-                            <option selected value> None </option>
+                            <option selected value="-- None --"> None </option>
                             {% for item in files %}
-                                <option id ="privKey" value = {{ item | replace('"', '')}}>{{ item | replace('"', '') }}</option>
+                                <option id ="certFiles" value = {{ item | replace('"', '')}}>{{ item | replace('"', '') }}</option>
                             {% endfor %}
                         </select>
                 </div>
                 <div class="form-group col-md-5">
                   <label for="CertType">Designation</label>
-                        <select class="form-control" id="CertType">
-                            <option selected value> -- select an option -- </option>
-                            <option value>CA Certificate</option>
-                            <option value>Client Key</option>
-                            <option value>Client Certificate</option>
+                        <select class="form-control" id="certType">
+                            <option selected value="0"> -- select an option -- </option>
+                            <option value="1">CA Certificate</option>
+                            <option value="2">Client Key</option>
+                            <option value="3">Client Certificate</option>
                         </select>
                 </div>
                 <div class="form-group col-md-2">
                   <label for="addBtn">&nbsp</label>
-                  <button id = "addBtn" type="button" class="btn btn-outline-success col-md-12 " onclick="SetCert()">Add</button>
+                  <button id = "addBtn" type="button" class="btn btn-outline-success col-md-12 " onclick="setCert()">Add</button>
                 </div>
               </div>
 
               <div class="row">
                 <div class="col-md-4">
                   <label>Selected CA</label><br/>
-                  <p>-- None --</p>
+                  <p id = "CAVal">-- None --</p>
                 </div>
                 <div class="col-md-4">
                   <label>Selected Client Key</label><br/>
-                  <p>-- None --</p>
+                  <p id="CKVal">-- None --</p>
                 </div>
                 <div class="col-md-4">
                   <label>Selected Client Cert</label><br/>
-                  <p>-- None --</p>
+                  <p id="CCVal" >-- None --</p>
                 </div>
               </div>
 
@@ -197,6 +197,27 @@
             });
 
         });
+
+        function setCert(){
+            var certFile = $("#files").val();
+            var certType = $("#certType").val();
+
+            switch (certType)
+            {
+              case("1"):
+                $("#CAVal").html(certFile);
+                break;
+              case("2"):
+                $("#CKVal").html(certFile);
+                break;
+              case("3"):
+                $("#CCVal").html(certFile);
+                break;
+              default:
+                alert("Error - Unconfigured value detected!");
+                break;
+            }
+        }
 
         function pingCloud(elem) {
             var cloudAddr = $("#cloudAddr").val();
