@@ -93,15 +93,15 @@
               <div class="row">
                 <div class="col-md-4">
                   <label>Selected CA</label><br/>
-                  <p id = "CAVal">-- None --</p>
+                  <p id = "CAVal">{% if cloud[0] is defined %} {{ cloud[0].caFile }} {% else %} -- None -- {% endif %}</p>
                 </div>
                 <div class="col-md-4">
                   <label>Selected Client Key</label><br/>
-                  <p id="CKVal">-- None --</p>
+                  <p id="CKVal">{% if cloud[0] is defined %} {{ cloud[0].clientKey }} {% else %} -- None -- {% endif %}</p>
                 </div>
                 <div class="col-md-4">
                   <label>Selected Client Cert</label><br/>
-                  <p id="CCVal" >-- None --</p>
+                  <p id="CCVal" >{% if cloud[0] is defined %} {{ cloud[0].clientCert }} {% else %} -- None -- {% endif %}</p>
                 </div>
               </div>
 
@@ -172,13 +172,15 @@
             var password = $("#pass").val(); //lastWillTopic
             var lastWillTopic = $("#lastWillTopic").val();
             var lastWillMessage = $("#lastWillMessage").val();
-            var privKey = $("#privKey").val();
-            var caCert = $("#caCert").val();
+            var clientKey = $("#CKVal").html();
+            var caCert = $("#CAVal").html();
+            var clientCert = $("#CCVal").html();
 
             var payload = { cloudAddr: cloudAddr, cloudPort: cloudPort, clientId: clientId, keepAlive: keepAlive
             , username: username, password: password, lastWillTopic: lastWillTopic, lastWillMessage: lastWillMessage
-            , caCert: caCert, privKey: privKey
+            , caCert: caCert, clientKey: clientKey, clientCert: clientCert,
             };
+
 
             console.log(payload);
 

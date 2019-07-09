@@ -64,13 +64,13 @@ def saveCloud():
 
    if request.method == 'POST':
       data = request.get_json()
-      sql = ' INSERT INTO cloudProfile(addr,port,lastWill,lastWillTopic,username,password,clientId,keepAlive, clientKey, caFile) VALUES(?,?,?,?,?,?,?,?,?,?) '
+      sql = ' INSERT INTO cloudProfile(addr,port,lastWill,lastWillTopic,username,password,clientId,keepAlive, clientCert, caFile, clientKey) VALUES(?,?,?,?,?,?,?,?,?,?,?) '
       conn = sqlite3.connect('database.db')
       conn.execute('DELETE FROM cloudProfile;')
       conn.commit()
       print(data)
       conn.execute(sql, (data['cloudAddr'], data['cloudPort'], data['lastWillMessage'], data['lastWillTopic'],
-                         data['username'],data['password'], data['clientId'],data['keepAlive'], data['privKey'],data['caCert']))
+                         data['username'],data['password'], data['clientId'],data['keepAlive'], data['clientCert'],data['caCert'],data['clientKey']))
 
       conn.commit()
       return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
@@ -255,7 +255,7 @@ if __name__ == "__main__":
 
    conn.execute("CREATE TABLE IF NOT EXISTS cloudProfile (addr TEXT, port TEXT,"
                 "lastWill TEXT, lastWillTopic TEXT, username TEXT, password TEXT,"
-                "caFile TEXT, clientKey TEXT, clientId TEXT, keepAlive TEXT);")
+                "clientCert TEXT, caFile TEXT, clientKey TEXT, clientId TEXT, keepAlive TEXT);")
 
 
    conn.execute("CREATE TABLE IF NOT EXISTS coordinates (oid TEXT, devName TEXT,"
