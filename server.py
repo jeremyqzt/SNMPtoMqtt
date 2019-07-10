@@ -8,6 +8,7 @@ import threading
 import threadLoop
 import paho.mqtt.client as paho
 from werkzeug import secure_filename
+import ssl
 
 certPath = "certs"
 app = Flask(__name__)
@@ -199,9 +200,18 @@ def engage():
 
             #TODO: Abstract this 1 level higher
             mqttClient= paho.Client(theCloud['clientId'])
+            caFileFP = certPath + "/" + theCloud['caFile'].strip()
+            clientKeyFP = certPath + "/" + theCloud['clientKey'].strip()
+            clientCertFP = certPath + "/" + theCloud['clientCert'].strip()
+            cafile = caFileFP if os.path.exists(caFileFP) else None
+            clientKey = clientKeyFP if os.path.exists(clientKeyFP) else None
+            clientCert = clientCertFP if os.path.exists(clientCertFP) else None
 
             if ((theCloud['username']) != "" or (theCloud['password'] != "")):
                 mqttClient.username_pw_set(theCloud['username'], theCloud['password'])
+
+            if (cafile is not None):
+                mqttClient.tls_set(ca_certs=cafile, certfile=clientCert, keyfile=clientKey)
 
 
             mqttClient.will_set(theCloud['lastWillTopic'], theCloud['lastWill'], 0)
