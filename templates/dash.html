@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Dashboard</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+
+                <a class="nav-link" href="/dash">Dashboard</a>
+                <a class="nav-link" href="/upload">Upload</a>
+                <a class="nav-link" href="/saveDev">Devices</a>
+                <a class="nav-link" href="/saveCloud">Clouds</a>
+                <a class="nav-link" href="/saveCoordinates">Polling</a>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <br />
+        <h4>Cloud Status</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Cloud Configured</th>
+                    <th scope="col">Cloud Connected</th>
+                    <th scope="col">Last Time Checked</th>
+                </tr>
+            </thead>
+            <tbody id="statusTable">
+                <tr>
+                    <td><span class="glyphicon glyphicon-ok"></span> IP Address: 127.0.0.1 </td>
+                    <td><span class="glyphicon glyphicon-ok"></span> Connected! </td>
+                    <td><span class="glyphicon glyphicon-time"></span> 1 Second Ago </td>
+               </tr>
+
+        </table>
+
+        <br />
+        <h4>SNMP Devices Status</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Device Configured</th>
+                    <th scope="col">Device Connected</th>
+                    <th scope="col">Last Time Checked</th>
+                </tr>
+            </thead>
+            <tbody id="statusTable">
+                <tr>
+                    <td><span class="glyphicon glyphicon-cloud"></span> Jeremy's Comp (127.0.0.1) </td>
+                    <td><span class="glyphicon glyphicon-ok"></span> Connected! </td>
+                    <td><span class="glyphicon glyphicon-time"></span> 1 Second Ago </td>
+                </tr>
+
+        </table>
+
+        <h4>Configured Coordinates</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Device</th>
+                    <th scope="col">OID</th>
+                    <th scope="col">Cloud Topic</th>
+                    <th scope="col">Last Poll Time</th>
+                    <th scope="col">Last Publish Time</th>
+                    <th scope="col">Last Poll Value</th>
+
+                </tr>
+            </thead>
+            <tbody id="statusTable">
+                <tr>
+                    <td><span class="glyphicon glyphicon-inbox"></span> Jeremy's Comp </td>
+                    <td><span class="glyphicon glyphicon-download"></span> 1.3.6 (Get-Next) </td>
+                    <td><span class="glyphicon glyphicon-cloud"></span> Connected! </td>
+                    <td><span class="glyphicon glyphicon-time"></span> 1 Second Ago </td>
+                    <td><span class="glyphicon glyphicon-time"></span> 1 Second Ago </td>
+                    <td><span class="glyphicon glyphicon-asterisk"></span> Some value </td>
+
+                </tr>
+
+        </table>
+
+    </div>
+
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="errEnc">
+        <div class="toast-header">
+            <strong class="mr-auto">Error!</strong>
+            <small class="text-muted"></small>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body" id="toastContent">
+        </div>
+    </div>
+
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="succ">
+        <div class="toast-header">
+            <strong class="mr-auto">Success!</strong>
+            <small class="text-muted"></small>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body" id="successContent">
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script>
+         $('.toast').toast({delay: 10000});
+
+    </script>
+
+</body>
