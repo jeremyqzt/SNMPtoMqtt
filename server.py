@@ -250,6 +250,13 @@ def pingDev():
       else:
             return json.dumps({'success':False}), 200, {'ContentType':'application/json'}
 
+@app.route('/dash', methods=['GET'])
+def dashboard():
+   if not session.get('logged_in'):
+      return render_template('login.html')
+
+   return render_template('dash.html')
+
 
 
 @app.route('/login', methods=['POST'])

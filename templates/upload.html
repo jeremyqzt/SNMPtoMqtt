@@ -25,9 +25,7 @@
             <a class="nav-link" href="/saveCoordinates">Polling</a>
 
         </ul>
-        <span class="navbar-text">
-          Upload Certificates and Private Keys
-        </span>
+
       </div>
     </nav>
     <div class="container">
@@ -48,7 +46,7 @@
           {% for item in files %}
             <tr>
               <td>{{ item | replace('"', '')}}</td>
-              <td><button type="button" onclick="deleteFile({{ item }})" class="btn btn-outline-danger">Delete</button></td>
+              <td><button type="button" onclick="deleteFile({{ item }})" class="btn btn-danger"> <span class="glyphicon glyphicon-minus"></span> Delete</button></td>
             </tr>
           {% endfor %}
           </tbody>
@@ -64,7 +62,7 @@
 
             </div>
             <div class="col text-right form-group">
-            <input type="submit" value="Upload" class="btn btn-outline-success">
+            <input type="submit" value="Upload" class="btn btn-success">
             </div>
             </form>
             </div>
@@ -76,7 +74,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script>
 
 
