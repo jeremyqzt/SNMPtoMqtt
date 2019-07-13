@@ -33,16 +33,16 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col">Cloud Configured</th>
-                    <th scope="col">Cloud Connected</th>
-                    <th scope="col">Last Time Checked</th>
+                    <th scope="col"><span class="glyphicon glyphicon-globe"></span> Cloud Address</th>
+                    <th scope="col"><span class="glyphicon glyphicon-ok"></span> Cloud Connected</th>
+                    <th scope="col"><span class="glyphicon glyphicon-time"></span> Last Time Checked</th>
                 </tr>
             </thead>
             <tbody id="statusTable">
                 <tr>
-                    <td><span class="glyphicon glyphicon-ok"></span> IP Address: 127.0.0.1 </td>
-                    <td><span class="glyphicon glyphicon-ok"></span> Connected! </td>
-                    <td><span class="glyphicon glyphicon-time"></span> 1 Second Ago </td>
+                    <td>IP Address: {{ connected['address'] }}  </td>
+                    <td> {{ connected['connected'] }} </td>
+                    <td id="cloudTimer"> 0 Second Ago </td>
                </tr>
 
         </table>
@@ -61,7 +61,7 @@
                 <tr>
                     <td><span class="glyphicon glyphicon-cloud"></span> Jeremy's Comp (127.0.0.1) </td>
                     <td><span class="glyphicon glyphicon-ok"></span> Connected! </td>
-                    <td><span class="glyphicon glyphicon-time"></span> 1 Second Ago </td>
+                    <td><span class="glyphicon glyphicon-time"></span> 0 Second Ago </td>
                 </tr>
 
         </table>
@@ -94,30 +94,6 @@
 
     </div>
 
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="errEnc">
-        <div class="toast-header">
-            <strong class="mr-auto">Error!</strong>
-            <small class="text-muted"></small>
-            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="toast-body" id="toastContent">
-        </div>
-    </div>
-
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="succ">
-        <div class="toast-header">
-            <strong class="mr-auto">Success!</strong>
-            <small class="text-muted"></small>
-            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="toast-body" id="successContent">
-        </div>
-    </div>
-
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -126,8 +102,28 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
-         $('.toast').toast({delay: 10000});
 
+         setInterval(updateTimes, 1000);
+         startSec = 0;
+         startMinutes = 0;
+         function updateTimes()
+         {
+           startSec++;
+           if (startSec >= 60)
+           {
+             startSec-=60;
+             startMinutes +=1;
+           }
+           if (startMinutes > 0)
+           {
+             timeString = startMinutes + " Min " + startSec + " Sec Ago";
+           }
+           else
+           {
+             timeString = startSec + " Seconds Ago";
+           }
+           $("#cloudTimer").html(timeString);
+         }
     </script>
 
 </body>

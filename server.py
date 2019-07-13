@@ -16,8 +16,30 @@ app = Flask(__name__)
 runningListCoor = []
 lock = threading.Lock()
 userSession = ""
+mqttClient = None
+cloudAddressStr = "Unattempted"
+flag_connected = "Unattempted"
+
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected!")
+    pahoStatus = ["Successful", "Incorrect Protocol Version", "Invalid Client ID", "Server Unavailable", "Bad Credentials", "Not Authorized"]
+
+    global flag_connected
+    if (rc == 0):
+      flag_connected = "Connected"
+    else:
+      flag_connected = "Disconencted - " + pahoStatus[rc]
+
+
+def on_disconnect(client, userdata, rc):
+    global flag_connected
+    flag_connected = "Disconnected"
+
 
 def stopAll():
+    global mqttClient
+
     for pollThread in runningListCoor:
         pollThread.setRunning(False)
 
@@ -25,6 +47,10 @@ def stopAll():
         pollThread.join()
 
     runningListCoor.clear()
+    if mqttClient is not None:
+      mqttClient.disconnect()
+
+    mqttClient = None
 
 def ping(ip, port):
    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -83,8 +109,7 @@ def saveCloud():
       rows = cursor.fetchall()
       cloudData = [dict(ix) for ix in rows]
       onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
-      print(onlyfiles)
-      
+
       conn.close()
       if (cloudData):
          return render_template('clouds.html', cloud=cloudData, files=map(json.dumps, onlyfiles), filesCa=map(json.dumps, onlyfiles))
@@ -106,7 +131,6 @@ def upload():
    if request.method == 'GET':
 
       onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
-      print(onlyfiles)
       return render_template('upload.html', files=map(json.dumps, onlyfiles))
 
 
@@ -183,6 +207,8 @@ def saveCoordinates():
 
 @app.route('/start', methods=['POST', 'GET'])
 def engage():
+    global cloudAddressStr
+    global mqttClient
     if request.method == 'POST':
         data = request.get_json()
         if (data[0]['action'].strip() == "start"):
@@ -198,8 +224,14 @@ def engage():
             conn.close()
 
 
+            #Kill Old Threads
+            stopAll()
+
             #TODO: Abstract this 1 level higher
             mqttClient= paho.Client(theCloud['clientId'])
+            mqttClient.on_connect = on_connect
+            mqttClient.on_disconnect = on_disconnect
+
             caFileFP = certPath + "/" + theCloud['caFile'].strip()
             clientKeyFP = certPath + "/" + theCloud['clientKey'].strip()
             clientCertFP = certPath + "/" + theCloud['clientCert'].strip()
@@ -216,12 +248,11 @@ def engage():
 
             mqttClient.will_set(theCloud['lastWillTopic'], theCloud['lastWill'], 0)
             mqttClient.connect(theCloud['addr'], int(theCloud['port']), int(theCloud['keepAlive']))
+            mqttClient.loop_start()
 
+            cloudAddressStr = theCloud['addr'] + ":" + theCloud['port']
             ########END TODO
 
-
-            #Kill Old Threads
-            stopAll()
 
             i = 0
             #Start New ones
@@ -252,10 +283,12 @@ def pingDev():
 
 @app.route('/dash', methods=['GET'])
 def dashboard():
-   if not session.get('logged_in'):
-      return render_template('login.html')
+    if not session.get('logged_in'):
+       return render_template('login.html')
 
-   return render_template('dash.html')
+    cloudStatus = {"connected": flag_connected, "address": cloudAddressStr}
+
+    return render_template('dash.html', connected = cloudStatus)
 
 
 
