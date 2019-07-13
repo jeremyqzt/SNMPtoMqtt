@@ -282,7 +282,7 @@ def pingDev():
             return json.dumps({'success':False}), 200, {'ContentType':'application/json'}
 
 @app.route('/dash', methods=['GET'])
-def dashboard():
+def dash():
     if not session.get('logged_in'):
        return render_template('login.html')
 
@@ -294,9 +294,9 @@ def dashboard():
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
-   userSession = request.form['username']
-   session['logged_in'] = True
-   return redirect(url_for('saveDev'))
+    userSession = request.form['username']
+    session['logged_in'] = True
+    return redirect(url_for('dash'))
 
 if __name__ == "__main__":
    app.secret_key = os.urandom(12)
