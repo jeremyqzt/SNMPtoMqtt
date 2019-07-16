@@ -22,7 +22,6 @@ flag_connected = "Unattempted"
 
 
 def on_connect(client, userdata, flags, rc):
-    print("Connected!")
     pahoStatus = ["Successful", "Incorrect Protocol Version", "Invalid Client ID", "Server Unavailable", "Bad Credentials", "Not Authorized"]
 
     global flag_connected

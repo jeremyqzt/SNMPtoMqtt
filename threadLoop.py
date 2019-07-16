@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import threading
 import time
@@ -6,6 +6,7 @@ import os
 import sys
 import json
 import paho.mqtt.client as paho
+import json
 
 import mysnmp
 
@@ -44,7 +45,8 @@ class pollThread (threading.Thread):
         self.mqttClient = mqtt
 
         self.running = True
-
+        self.data = {}
+        self.JSONdata = None
     def run(self):
 
         while (self.running):
@@ -62,8 +64,17 @@ class pollThread (threading.Thread):
     def setRunning(self, newVal):
         self.running = newVal
 
-    def getRunning(self) -> bool:
+    def getRunning(self):
         return self.running
+
+    def getHost(self):
+        return self.SnmpIp
+
+    def getPort(self):
+        return str(self.SnmpPort)
+
+    def getLastResp(self):
+        return self.SnmpResp
 
     def _poll(self):
         if (self.SnmpOper == "Get"):
@@ -71,7 +82,17 @@ class pollThread (threading.Thread):
         else:
             self.SnmpResp = self.SnmpAgent.getNext(self.OID, self.community)
 
+
+        print(self.snmpResp)
+        self.data['Error Indication'] = ("%s" % self.SnmpAgent.errorIndic)
+        self.data['Error Status'] = ("%s" % self.SnmpAgent.status)
+        self.data['OID'] = ("%s" % self.SnmpAgent.name)
+        self.data['Value'] = ("%s" % self.SnmpAgent.value)
+        self.data['Topic'] = self.topic
+        self.JSONdata = json.dumps(self.data)
+
+
     def _send(self):
-        self.mqttClient.publish(self.topic, self.SnmpResp)
+        self.mqttClient.publish(self.topic, self.JSONdata)
 
 

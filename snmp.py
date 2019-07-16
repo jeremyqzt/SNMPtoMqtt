@@ -55,5 +55,5 @@ def getNext(host, oid):
 			for varBind in varBinds:  # SNMP response contents
 				print(' = '.join([x.prettyPrint() for x in varBind]))
 
-getBulk('192.168.0.50','1.3.6.1.2.1.47.1.1.1.1.2')
+#getBulk('192.168.0.50','1.3.6.1.2.1.47.1.1.1.1.2')
 #get('192.168.0.50','1.3.6.1.2.1.47.1.1.1.1.2')

@@ -5,29 +5,40 @@ class mqttSNMP():
     def __init__(self, host, port):
         self.host = host
         self.port = port
+        self.errorIndic = None
+        self.status = None
+        self.name = ""
+        self.value = ""
+
     def get(self, oid, community):
         iterator = getCmd(SnmpEngine(), CommunityData(community), UdpTransportTarget((self.host, self.port), timeout = 1, retries=0), ContextData(), ObjectType(ObjectIdentity(oid)))
         errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
         if errorIndication:
-            return(errorIndication)
+            self.errorIndic = errorIndication
+            return ("Error in Polling : %s" % self.errorIndic)
         else:
             if errorStatus:
-                return('%s : %s' % (errorStatus.prettyPrint(), varBinds[int(errorIndex)-1] if errorIndex else '?'))
+                self.status = errorStatus.prettyPrint()
+                return ("Error in Polling : %s" % self.status)
             else:
-                name, value = varBinds[0]
-                return('%s : %s' % (name, value))
+                self.name, self.value = varBinds[0]
+                return('%s : %s' % (self.name, self.value))
+
 
     def getNext(self, oid, community):
         iterator = nextCmd(SnmpEngine(), CommunityData(community),  UdpTransportTarget((self.host, self.port), timeout = 1, retries=0), ContextData(), ObjectType(ObjectIdentity(oid)))
         errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
         if errorIndication:
-            return('%s : %s'('error', errorIndication))
+            self.errorIndic = errorIndication
+            return ("Error in Polling : %s" % self.errorIndic)
         else:
             if errorStatus:
-                return('%s : %s' % (errorStatus.prettyPrint(), varBinds[int(errorIndex)-1] if errorIndex else '?'))
+                self.status = errorStatus.prettyPrint()
+                return ("Error in Polling : %s" % self.status)
             else:
-                name, value = varBinds[0]
-                return('%s : %s' % (name, value))
+                self.name, self.value = varBinds[0]
+                return('%s : %s' % (self.name, self.value))
+
 
 ##        def getBulk(self, oid):
 ##                iterator = bulkCmd(SnmpEngine(), CommunityData('public'),  UdpTransportTarget((host, 161)), ContextData(), 0, 25, ObjectType(ObjectIdentity(oid)))
