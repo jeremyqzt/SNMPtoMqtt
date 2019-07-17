@@ -50,7 +50,6 @@ class pollThread (threading.Thread):
     def run(self):
 
         while (self.running):
-
             self._poll()
             self._send()
 
