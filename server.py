@@ -52,15 +52,14 @@ def stopAll():
     mqttClient = None
 
 def ping(ip, port):
-   print(ip + port)
-   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-   s.settimeout(1)
-   try:
-      s.connect((ip, int(port)))
-      s.shutdown(2)
-      return True
-   except:
-      return False
+    print(ip + port)
+    response = os.system("ping -c 1 " + ip)
+
+
+    if response == 0:
+        return True
+    else:
+        return False
 
 @app.route('/')
 def home():

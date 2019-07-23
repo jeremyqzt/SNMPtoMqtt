@@ -39,7 +39,7 @@
               <th scope="col"><span class="glyphicon glyphicon-record"></span> Port</th>
               <th scope="col"><span class="glyphicon glyphicon-flash"></span> Ping</th>
               <th scope="col" <span class="glyphicon glyphicon-cog"></span> Action</th>
-              <th scope="col"> <span class="glyphicon glyphicon-lock"></span> Socket Bind</th>
+              <th scope="col"> <span class="glyphicon glyphicon-lock"></span> Ping </th>
 
             </tr>
           </thead>
@@ -221,6 +221,7 @@
                 success: function (data) {
                     console.log(data.success);
                     if (data.success) {
+                        $(elem).addClass("btn-danger");
                         $(elem).removeClass("btn-outline-warning");
                         $(elem).addClass("btn-success");
                         $("#successContent").html("Ping Successful");
@@ -229,6 +230,7 @@
                         //$("#ping" + ip + "-" + port).html("Reachable");
                     } else {
                         $(elem).removeClass("btn-outline-warning");
+                        $(elem).addClass("btn-success");
                         $(elem).addClass("btn-danger");
                         $("#toastContent").html("IP Address " + ip + " Could Not Be Reached!");
                         $('#errEnc').toast('show');

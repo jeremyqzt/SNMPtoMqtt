@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pysnmp.hlapi import *
+import datetime
 
 class mqttSNMP():
     def __init__(self, host, port):
@@ -9,36 +10,82 @@ class mqttSNMP():
         self.status = None
         self.name = ""
         self.value = ""
+        self.pollError = False
+        self.data = {}
 
     def get(self, oid, community):
-        iterator = getCmd(SnmpEngine(), CommunityData(community), UdpTransportTarget((self.host, self.port), timeout = 1, retries=0), ContextData(), ObjectType(ObjectIdentity(oid)))
-        errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
-        if errorIndication:
-            self.errorIndic = errorIndication
-            return ("Error in Polling : %s" % self.errorIndic)
-        else:
-            if errorStatus:
-                self.status = errorStatus.prettyPrint()
-                return ("Error in Polling : %s" % self.status)
+        self._clearFields()
+        try:
+            iterator = getCmd(SnmpEngine(),
+            CommunityData(community),
+            UdpTransportTarget((self.host, self.port),
+            timeout = 1, retries=0),
+            ContextData(), ObjectType(ObjectIdentity(oid)))
+
+            errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
+            if errorIndication:
+                self.errorIndic = errorIndication
             else:
-                self.name, self.value = varBinds[0]
-                return('%s : %s' % (self.name, self.value))
+                if errorStatus:
+                    self.status = errorStatus.prettyPrint()
+                else:
+                    self.name, self.value = varBinds[0]
+
+        except:
+            self.pollError = True
+            self.errorIndic = "Error"
+            self.status = "Could Not Issue Get-Next Request"
+
+
+        return self._constructResp()
+
 
 
     def getNext(self, oid, community):
-        iterator = nextCmd(SnmpEngine(), CommunityData(community),  UdpTransportTarget((self.host, self.port), timeout = 1, retries=0), ContextData(), ObjectType(ObjectIdentity(oid)))
-        errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
-        if errorIndication:
-            self.errorIndic = errorIndication
-            return ("Error in Polling : %s" % self.errorIndic)
-        else:
-            if errorStatus:
-                self.status = errorStatus.prettyPrint()
-                return ("Error in Polling : %s" % self.status)
-            else:
-                self.name, self.value = varBinds[0]
-                return('%s : %s' % (self.name, self.value))
+        self._clearFields()
+        try:
+            iterator = nextCmd(SnmpEngine(),
+            CommunityData(community),
+            UdpTransportTarget((self.host, self.port),
+            timeout = 1, retries=0),
+            ContextData(),
+            ObjectType(ObjectIdentity(oid)))
 
+            errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
+
+            if errorIndication:
+                self.errorIndic = errorIndication
+            else:
+                if errorStatus:
+                    self.status = errorStatus.prettyPrint()
+                else:
+                    self.name, self.value = varBinds[0]
+        except:
+            self.pollError = True
+            self.errorIndic = "Error"
+            self.status = "Could Not Issue Get Request"
+
+        return self._constructResp()
+
+
+
+    def _constructResp(self):
+        self.data['Error Indication'] = ("%s" % self.errorIndic)
+        self.data['Error Status'] = ("%s" % self.status)
+        self.data['OID'] = ("%s" % self.name)
+        self.data['Value'] = ("%s" % self.value)
+        self.data['Time'] = ("%s" % datetime.datetime.now())
+        self.data['Poll Error'] = self.pollError
+        self.data['Host'] = self.host
+        self.data['Port'] = self.port
+
+        return self.data
+
+    def _clearFields(self):
+        self.errorIndic = None
+        self.status = None
+        self.value = ""
+        self.data = {}
 
 ##        def getBulk(self, oid):
 ##                iterator = bulkCmd(SnmpEngine(), CommunityData('public'),  UdpTransportTarget((host, 161)), ContextData(), 0, 25, ObjectType(ObjectIdentity(oid)))

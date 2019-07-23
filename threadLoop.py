@@ -37,7 +37,7 @@ class pollThread (threading.Thread):
         self.topic = southCfg['topic']
         self.keepAlive = int(northCfg['keepAlive'])
 
-        self.SnmpResp = ""
+        self.SnmpResp = {}
         self.MqttSuccess = False
 
         self.SnmpAgent = mysnmp.mqttSNMP(self.SnmpIp, self.SnmpPort)
@@ -81,14 +81,10 @@ class pollThread (threading.Thread):
         else:
             self.SnmpResp = self.SnmpAgent.getNext(self.OID, self.community)
 
+        self.SnmpResp['Topic'] = self.topic #add topic back
 
-        print(self.snmpResp)
-        self.data['Error Indication'] = ("%s" % self.SnmpAgent.errorIndic)
-        self.data['Error Status'] = ("%s" % self.SnmpAgent.status)
-        self.data['OID'] = ("%s" % self.SnmpAgent.name)
-        self.data['Value'] = ("%s" % self.SnmpAgent.value)
-        self.data['Topic'] = self.topic
-        self.JSONdata = json.dumps(self.data)
+        self.JSONdata = json.dumps(self.SnmpResp)
+        print(self.JSONdata)
 
 
     def _send(self):
