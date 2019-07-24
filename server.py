@@ -286,8 +286,12 @@ def dash():
        return render_template('login.html')
 
     cloudStatus = {"connected": flag_connected, "address": cloudAddressStr}
+    pointsStatus = []
+    for t in runningListCoor:
+        pointsStatus.append(t.SnmpResp)
+    print(pointsStatus)
 
-    return render_template('dash.html', connected = cloudStatus)
+    return render_template('dash.html', connected = cloudStatus, points = pointsStatus)
 
 
 

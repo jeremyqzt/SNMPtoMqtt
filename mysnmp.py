@@ -15,6 +15,7 @@ class mqttSNMP():
 
     def get(self, oid, community):
         self._clearFields()
+        self.name = oid
         try:
             iterator = getCmd(SnmpEngine(),
             CommunityData(community),
@@ -24,17 +25,17 @@ class mqttSNMP():
 
             errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
             if errorIndication:
-                self.errorIndic = errorIndication
+                self.errorIndic = self.value = errorIndication
             else:
                 if errorStatus:
-                    self.status = errorStatus.prettyPrint()
+                    self.status = self.value = "Could Not Issue Get-Next Request"
                 else:
                     self.name, self.value = varBinds[0]
 
         except:
             self.pollError = True
-            self.errorIndic = "Error"
-            self.status = "Could Not Issue Get-Next Request"
+            self.errorIndic =  "Error"
+            self.status = self.value ="Could Not Issue Get-Next Request"
 
 
         return self._constructResp()
@@ -43,6 +44,7 @@ class mqttSNMP():
 
     def getNext(self, oid, community):
         self._clearFields()
+        self.name =  oid
         try:
             iterator = nextCmd(SnmpEngine(),
             CommunityData(community),
@@ -54,16 +56,16 @@ class mqttSNMP():
             errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
 
             if errorIndication:
-                self.errorIndic = errorIndication
+                self.errorIndic = self.value = errorIndication
             else:
                 if errorStatus:
-                    self.status = errorStatus.prettyPrint()
+                    self.status = self.value ="Could Not Issue Get-Next Request"
                 else:
                     self.name, self.value = varBinds[0]
         except:
             self.pollError = True
             self.errorIndic = "Error"
-            self.status = "Could Not Issue Get Request"
+            self.status = self.value ="Could Not Issue Get-Next Request"
 
         return self._constructResp()
 

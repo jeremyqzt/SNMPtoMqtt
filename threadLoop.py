@@ -7,6 +7,7 @@ import sys
 import json
 import paho.mqtt.client as paho
 import json
+import datetime
 
 import mysnmp
 
@@ -83,11 +84,9 @@ class pollThread (threading.Thread):
 
         self.SnmpResp['Topic'] = self.topic #add topic back
 
-        self.JSONdata = json.dumps(self.SnmpResp)
-        print(self.JSONdata)
-
-
     def _send(self):
+        self.SnmpResp['Publish'] = ("%s" % datetime.datetime.now())
+        self.JSONdata = json.dumps(self.SnmpResp)
         self.mqttClient.publish(self.topic, self.JSONdata)
 
 
