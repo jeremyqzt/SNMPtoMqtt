@@ -287,9 +287,13 @@ def dash():
 
     cloudStatus = {"connected": flag_connected, "address": cloudAddressStr}
     pointsStatus = []
+    deviceList = []
+
     for t in runningListCoor:
-        pointsStatus.append(t.SnmpResp)
-    print(pointsStatus)
+        item = t.SnmpResp
+        pointsStatus.append(item)
+        hostPortStr = ("%s: %s" % (item['Host'], item["Port"]))
+        deviceList.append({"hostPort": hostPortStr, "Connected": True})
 
     return render_template('dash.html', connected = cloudStatus, points = pointsStatus)
 

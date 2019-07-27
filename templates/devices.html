@@ -72,7 +72,7 @@
     <div class="container">
       <div class="row">
         <div class="col text-center"> 
-            <button type="button" class="btn btn-warning float-center col-6" id="saveCfg"> <span class="glyphicon glyphicon-save"></span>  Save All Configured Devices</button>
+            <button type="button" class="btn btn-success float-center col-6" id="saveCfg"> <span class="glyphicon glyphicon-save"></span>  Save All Configured Devices</button>
             </div>
         </div>
     </div>
@@ -205,7 +205,7 @@
 
         function deleteMe(elem) {
             $(elem).closest('tr').get(0).remove();
-            $("#saveCfg").addClass("btn-outline-warning");
+            $("#saveCfg").addClass("btn-warning");
             $("#saveCfg").removeClass("btn-success");
         }
 

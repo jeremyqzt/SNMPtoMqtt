@@ -83,6 +83,7 @@ class pollThread (threading.Thread):
             self.SnmpResp = self.SnmpAgent.getNext(self.OID, self.community)
 
         self.SnmpResp['Topic'] = self.topic #add topic back
+        self.JSONdata = json.dumps(self.SnmpResp)
 
     def _send(self):
         self.SnmpResp['Publish'] = ("%s" % datetime.datetime.now())
