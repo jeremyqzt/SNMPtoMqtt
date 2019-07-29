@@ -60,7 +60,7 @@
                     </td>
                     <td> <div class="form-row align-items-center"><input type="text" id="topic" class="form-control" placeholder="Set a Topic"></div></td>
                     <td> <div class="form-row align-items-center"><input type="text" id="interval" class="form-control" value="600"></div></td>
-                    <th><button type="button" id="addDev" class="btn btn-success">Create</button></th>
+                    <th><button type="button" id="addDev" class="btn btn-outline-success"> <span class="glyphicon glyphicon-plus"></span>  Create</button></th>
 
                 </tr>
 
@@ -71,7 +71,7 @@
                     <td> {{ y.devName }}</td>
                     <td> {{ y.topic }}</td>
                     <td> {{ y.interval }}</td>
-                    <td><button onclick="deleteMe(this)" class="btn btn-danger" type="button">Delete</button></td>
+                    <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> <span class="glyphicon glyphicon-minus"></span>  Delete</button></td>
 
                 </tr>
                 {% endfor %}
@@ -84,9 +84,9 @@
     <div class="container">
         <div class="row">
             <div class="col text-center">
-                <button type="button" class="btn btn-warning float-center col-5" id="polling">Start Polling</button>
+                <button type="button" class="btn btn-warning float-center col-5" id="polling"><span class="glyphicon glyphicon-play"></span> Start Polling</button>
                 &nbsp;
-                <button type="button" class="btn btn-success float-center col-5" id="saveCfg">Save All Coordinates</button>
+                <button type="button" class="btn btn-success float-center col-5" id="saveCfg"> <span class="glyphicon glyphicon-save"></span> Save All Coordinates</button>
             </div>
         </div>
     </div>
@@ -183,13 +183,13 @@
                 url: '/saveCoordinates',
                 data: JSON.stringify(objCfg),
                 success: function (data) {
-                    $("#saveCfg").removeClass("btn-outline-warning");
+                    $("#saveCfg").removeClass("btn-warning");
                     $("#saveCfg").addClass("btn-success");
                     $("#successContent").html("All Configuration Successfully Saved.");
                     $('#succ').toast('show');
                     //Stop polling on save
                     $("#polling").removeClass("btn-success");
-                    $("#polling").addClass("btn-outline-warning");
+                    $("#polling").addClass("btn-warning");
                 },
                 contentType: "application/json",
                 dataType: 'json'
@@ -201,7 +201,6 @@
             var objCfg = [];
             var action = { action: "start" };
             objCfg.push(action);
-            console.log(objCfg);
 
             $.ajax({
                 type: 'POST',
@@ -229,7 +228,7 @@
             var topic = $("#topic").val();
             var interval = $("#interval").val();
 
-            table.append('<tr><td>' + OID + '</td><td>' + oper + ' </td><td>' + ip + ' </td><td>' + topic +'</td><td>' + interval +'</td><td><button onclick="deleteMe(this)" class="btn btn-danger" type="button">Delete</button></td></tr>');
+            table.append('<tr><td>' + OID + '</td><td>' + oper + ' </td><td>' + ip + ' </td><td>' + topic +'</td><td>' + interval +'</td><td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button">   <span class="glyphicon glyphicon-minus"></span>  Delete</button></td></tr>');
             $("#saveCfg").addClass("btn-outline-warning");
             $("#saveCfg").removeClass("btn-success");
 
@@ -237,7 +236,7 @@
 
         function deleteMe(elem) {
             $(elem).closest('tr').get(0).remove();
-            $("#saveCfg").addClass("btn-outline-warning");
+            $("#saveCfg").addClass("btn-warning");
             $("#saveCfg").removeClass("btn-success");
         }
         
