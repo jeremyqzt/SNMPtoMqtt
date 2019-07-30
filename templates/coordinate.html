@@ -59,7 +59,7 @@
                         </select>
                     </td>
                     <td> <div class="form-row align-items-center"><input type="text" id="topic" class="form-control" placeholder="Set a Topic"></div></td>
-                    <td> <div class="form-row align-items-center"><input type="text" id="interval" class="form-control" value="600"></div></td>
+                    <td> <div class="form-row align-items-center"><input type="text" id="interval" class="form-control" value="30"></div></td>
                     <th><button type="button" id="addDev" class="btn btn-outline-success"> <span class="glyphicon glyphicon-plus"></span>  Create</button></th>
 
                 </tr>
@@ -240,11 +240,12 @@
             $("#saveCfg").removeClass("btn-success");
         }
         
-        function checkOID() {
-            //Return True for now
-            return true;
+        function checkOID(in) {
+            return RegExp("^([1-9][0-9]{0,3}|0)(\.([1-9][0-9]{0,3}|0)){1,13}$").test(in);
         }
-        
+        function checkTopic(in) {
+            return (!(/\s/.test(in)) && in.length > 1)
+        }
         function checkinterval(interval){
             return !isNaN(interval);
         }
