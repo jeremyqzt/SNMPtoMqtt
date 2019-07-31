@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <title>Polling</title>
 </head>
@@ -91,36 +91,26 @@
         </div>
     </div>
 
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="errEnc">
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toastInfo">
         <div class="toast-header">
-            <strong class="mr-auto">Error!</strong>
+            <strong class="mr-auto">Info!</strong>
             <small class="text-muted"></small>
             <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <div class="toast-body" id="toastContent">
-        </div>
-    </div>
-
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="succ">
-        <div class="toast-header">
-            <strong class="mr-auto">Success!</strong>
-            <small class="text-muted"></small>
-            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="toast-body" id="successContent">
+        <div class="toast-body" >
+        <ul id="toastContent">
+        </ul>
         </div>
     </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
     <script>
         $( document ).ready(function() {
             $.ajax({
@@ -143,7 +133,7 @@
             });
         });
 
-        $('.toast').toast({delay: 10000});
+        $('.toast').toast({delay: 25000}); //25 seconds
 
         $("#saveCfg").click(function () {
             var objCfg = [];
@@ -185,8 +175,8 @@
                 success: function (data) {
                     $("#saveCfg").removeClass("btn-warning");
                     $("#saveCfg").addClass("btn-success");
-                    $("#successContent").html("All Configuration Successfully Saved.");
-                    $('#succ').toast('show');
+                    $("#toastContent").html("<li>All Configuration Successfully Saved! </li>");
+                    $('#toastInfo').toast('show');
                     //Stop polling on save
                     $("#polling").removeClass("btn-success");
                     $("#polling").addClass("btn-warning");
@@ -210,8 +200,8 @@
                     console.log(data);
                     $("#polling").removeClass("btn-warning");
                     $("#polling").addClass("btn-success");
-                    $("#successContent").html("Polling Started.");
-                    $('#succ').toast('show');
+                    $("#toastContent").html("<li>Polling Started!</li>");
+                    $('#toastInfo').toast('show');
                 },
                 contentType: "application/json",
                 dataType: 'json'
@@ -220,7 +210,9 @@
 
 
         $("#addDev").click(function () {
+            var error = false;
             var table = $("#coordinatesTable");
+            var errorStatus = "";
 
             var OID = $("#OID").val(); //snmpOper
             var oper = $("#snmpOper").val();
@@ -228,7 +220,28 @@
             var topic = $("#topic").val();
             var interval = $("#interval").val();
 
-            table.append('<tr><td>' + OID + '</td><td>' + oper + ' </td><td>' + ip + ' </td><td>' + topic +'</td><td>' + interval +'</td><td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button">   <span class="glyphicon glyphicon-minus"></span>  Delete</button></td></tr>');
+            if (!checkOID(OID)) {
+                error = true;
+                errorStatus = "<li>OID is Not Valid!</li>"
+            }
+
+            if (!checkTopic(topic)) {
+                error = true;
+                errorStatus += "<li>Topic is Not Valid, It Cannot Contain Spaces!</li>"
+            }
+
+            if (!checkinterval(interval)) {
+                error = true;
+                errorStatus += "<li>Internal is Not Valid, It Must Be a Number!</li>"
+            }
+
+            if (error) {
+                $("#toastContent").html(errorStatus);
+                $('#toastInfo').toast('show');
+                return;
+            }
+
+            table.append('<tr><td>' + OID + '</td><td>' + oper + ' </td><td>' + ip + ' </td><td>' + topic + '</td><td>' + interval + '</td><td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button">   <span class="glyphicon glyphicon-minus"></span>  Delete</button></td></tr>');
             $("#saveCfg").addClass("btn-outline-warning");
             $("#saveCfg").removeClass("btn-success");
 
@@ -240,12 +253,14 @@
             $("#saveCfg").removeClass("btn-success");
         }
         
-        function checkOID(in) {
-            return RegExp("^([1-9][0-9]{0,3}|0)(\.([1-9][0-9]{0,3}|0)){1,13}$").test(in);
+        function checkOID(inStr) {
+            return RegExp("^([1-9][0-9]{0,3}|0)(\.([1-9][0-9]{0,3}|0)){1,13}$").test(inStr);
         }
-        function checkTopic(in) {
-            return (!(/\s/.test(in)) && in.length > 1)
+
+        function checkTopic(inStr) {
+            return (!(/\s/.test(inStr)) && inStr.length > 1)
         }
+
         function checkinterval(interval){
             return !isNaN(interval);
         }
