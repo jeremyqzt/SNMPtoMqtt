@@ -4,41 +4,37 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
 
     <title>Polling</title>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarText">
-            <ul class="navbar-nav mr-auto">
-
-            <a class="nav-link" href="/dash">Dashboard</a>
-            <a class="nav-link" href="/upload">Upload</a>
-            <a class="nav-link" href="/saveDev">Devices</a>
-            <a class="nav-link" href="/saveCloud">Clouds</a>
-            <a class="nav-link" href="/saveCoordinates">Polling</a>
-            </ul>
-        </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">SNMP to MQTT</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item"><a class="nav-link" href="/dash">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="/upload">Upload</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saveDev">Devices</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saveCloud">Clouds</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saveCoordinates">Polling</a></li>
+        </ul>
+      </div>
     </nav>
-
-    <div class="container">
+    <div class="container-fluid">
         <br />
         <h4>Configure Polling</h4>
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col"><span class="glyphicon glyphicon-screenshot"></span> OID</th>
-                    <th scope="col"><span class="glyphicon glyphicon-triangle-bottom"></span> Operation</th>
-                    <th scope="col"><span class="glyphicon glyphicon-inbox"></span> Device</th>
-                    <th scope="col"><span class="glyphicon glyphicon-triangle-top"></span> Topic</th>
-                    <th scope="col"><span class="glyphicon glyphicon-time"></span> Interval</th>
-                    <th scope="col"><span class="glyphicon glyphicon-cog"></span> Action</th>
+                    <th scope="col">OID</th>
+                    <th scope="col">Operation</th>
+                    <th scope="col">Device</th>
+                    <th scope="col">Topic</th>
+                    <th scope="col">Interval</th>
+                    <th scope="col">Action</th>
 
                 </tr>
             </thead>
@@ -60,7 +56,7 @@
                     </td>
                     <td> <div class="form-row align-items-center"><input type="text" id="topic" class="form-control" placeholder="Set a Topic"></div></td>
                     <td> <div class="form-row align-items-center"><input type="text" id="interval" class="form-control" value="30"></div></td>
-                    <th><button type="button" id="addDev" class="btn btn-outline-success"> <span class="glyphicon glyphicon-plus"></span>  Create</button></th>
+                    <th><button type="button" id="addDev" class="btn btn-outline-success"> Create</button></th>
 
                 </tr>
 
@@ -71,7 +67,7 @@
                     <td> {{ y.devName }}</td>
                     <td> {{ y.topic }}</td>
                     <td> {{ y.interval }}</td>
-                    <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> <span class="glyphicon glyphicon-minus"></span>  Delete</button></td>
+                    <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> Delete</button></td>
 
                 </tr>
                 {% endfor %}
@@ -84,9 +80,9 @@
     <div class="container">
         <div class="row">
             <div class="col text-center">
-                <button type="button" class="btn btn-warning float-center col-5" id="polling"><span class="glyphicon glyphicon-play"></span> Start Polling</button>
+                <button type="button" class="btn btn-warning float-center col-5" id="polling"> Start Polling</button>
                 &nbsp;
-                <button type="button" class="btn btn-success float-center col-5" id="saveCfg"> <span class="glyphicon glyphicon-save"></span> Save All Coordinates</button>
+                <button type="button" class="btn btn-success float-center col-5" id="saveCfg"> Save All Coordinates</button>
             </div>
         </div>
     </div>
@@ -105,10 +101,7 @@
         </div>
     </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
@@ -241,7 +234,7 @@
                 return;
             }
 
-            table.append('<tr><td>' + OID + '</td><td>' + oper + ' </td><td>' + ip + ' </td><td>' + topic + '</td><td>' + interval + '</td><td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button">   <span class="glyphicon glyphicon-minus"></span>  Delete</button></td></tr>');
+            table.append('<tr><td>' + OID + '</td><td>' + oper + ' </td><td>' + ip + ' </td><td>' + topic + '</td><td>' + interval + '</td><td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> Delete</button></td></tr>');
             $("#saveCfg").addClass("btn-outline-warning");
             $("#saveCfg").removeClass("btn-success");
 
