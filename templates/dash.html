@@ -1,41 +1,34 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
     <title>Dashboard</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarText">
-            <ul class="navbar-nav mr-auto">
-
-                <a class="nav-link" href="/dash">Dashboard</a>
-                <a class="nav-link" href="/upload">Upload</a>
-                <a class="nav-link" href="/saveDev">Devices</a>
-                <a class="nav-link" href="/saveCloud">Clouds</a>
-                <a class="nav-link" href="/saveCoordinates">Polling</a>
-            </ul>
-        </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">SNMP to MQTT</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item"><a class="nav-link" href="/dash">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="/upload">Upload</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saveDev">Devices</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saveCloud">Clouds</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saveCoordinates">Polling</a></li>
+        </ul>
+      </div>
     </nav>
-
-    <div class="container">
+    <div class="container-fluid">
         <br />
         <h4>Cloud Status</h4>
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col"><span class="glyphicon glyphicon-globe"></span> Cloud Address</th>
-                    <th scope="col"><span class="glyphicon glyphicon-ok"></span> Cloud Connected</th>
-                    <th scope="col"><span class="glyphicon glyphicon-time"></span> Last Time Checked</th>
+                    <th scope="col">Cloud Address</th>
+                    <th scope="col">Cloud Connected</th>
+                    <th scope="col">Last Time Checked</th>
                 </tr>
             </thead>
             <tbody id="statusTable">
@@ -48,34 +41,17 @@
         </table>
 
         <br />
-        <h4>SNMP Devices Status</h4>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col"><span class="glyphicon glyphicon-globe"></span> Device Address</th>
-                    <th scope="col"><span class="glyphicon glyphicon-ok"></span> Last Reacheable</th>
-                    <th scope="col"><span class="glyphicon glyphicon-time"></span> Last Time Checked</th>
-                </tr>
-            </thead>
-            <tbody id="statusTable">
-                <tr>
-                    <td> Jeremy's Comp (127.0.0.1) </td>
-                    <td> Connected! </td>
-                    <td>0 Second Ago </td>
-                </tr>
-
-        </table>
 
         <h4>Configured Coordinates</h4>
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col"><span class="glyphicon glyphicon-inbox"></span> Device</th>
-                    <th scope="col"><span class="glyphicon glyphicon-download"></span> OID</th>
-                    <th scope="col"><span class="glyphicon glyphicon-cloud"></span> Cloud Topic</th>
-                    <th scope="col"><span class="glyphicon glyphicon-time"></span>  Last Poll Time</th>
-                    <th scope="col"><span class="glyphicon glyphicon-time"></span> Last Publish Time</th>
-                    <th scope="col"><span class="glyphicon glyphicon-asterisk"></span> Last Poll Value</th>
+                    <th scope="col">Device</th>
+                    <th scope="col">OID</th>
+                    <th scope="col">Cloud Topic</th>
+                    <th scope="col">Last Poll Time</th>
+                    <th scope="col">Last Publish Time</th>
+                    <th scope="col">Last Poll Value</th>
 
                 </tr>
             </thead>
@@ -84,7 +60,7 @@
                 <tr>
                     <td> {{x.Host}}:{{x.Port}} </td>
                     <td> {{x.OID}} </td>
-                    <td>{{x.Topic}}</td>
+                    <td> {{x.Topic}}</td>
                     <td> {{x.Time}} </td>
                     <td> {{x.Publish}} </td>
                     <td> {{x.Value}} </td>
@@ -94,12 +70,8 @@
 
     </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
 

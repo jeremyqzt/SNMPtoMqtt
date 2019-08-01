@@ -1,7 +1,6 @@
 ﻿<!doctype html>
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -80,9 +79,9 @@
     <div class="container">
         <div class="row">
             <div class="col text-center">
-                <button type="button" class="btn btn-warning float-center col-5" id="polling"> Start Polling</button>
+                <button type="button" class="btn btn-outline-warning float-center col-5" id="polling"> Start Polling</button>
                 &nbsp;
-                <button type="button" class="btn btn-success float-center col-5" id="saveCfg"> Save All Coordinates</button>
+                <button type="button" class="btn btn-outline-success float-center col-5" id="saveCfg"> Save All Coordinates</button>
             </div>
         </div>
     </div>
@@ -112,13 +111,8 @@
                 success: function (data) {
                     if (data['started'])
                     {
-                        $("#polling").removeClass("btn-warning");
-                        $("#polling").addClass("btn-success");
-                    }
-                    else
-                    {
-                        $("#polling").removeClass("btn-success");
-                        $("#polling").addClass("btn-warning");
+                        $("#polling").removeClass("btn-outline-warning");
+                        $("#polling").addClass("btn-outline-success");
                     }
                 },
                 contentType: "application/json",
@@ -166,13 +160,13 @@
                 url: '/saveCoordinates',
                 data: JSON.stringify(objCfg),
                 success: function (data) {
-                    $("#saveCfg").removeClass("btn-warning");
-                    $("#saveCfg").addClass("btn-success");
+                    $("#saveCfg").removeClass("btn-outline-warning");
+                    $("#saveCfg").addClass("btn-outline-success");
                     $("#toastContent").html("<li>All Configuration Successfully Saved! </li>");
                     $('#toastInfo').toast('show');
                     //Stop polling on save
-                    $("#polling").removeClass("btn-success");
-                    $("#polling").addClass("btn-warning");
+                    $("#polling").removeClass("btn-outline-success");
+                    $("#polling").addClass("btn-outline-warning");
                 },
                 contentType: "application/json",
                 dataType: 'json'
@@ -191,8 +185,8 @@
                 data: JSON.stringify(objCfg),
                 success: function (data) {
                     console.log(data);
-                    $("#polling").removeClass("btn-warning");
-                    $("#polling").addClass("btn-success");
+                    $("#polling").removeClass("btn-outline-warning");
+                    $("#polling").addClass("btn-outline-success");
                     $("#toastContent").html("<li>Polling Started!</li>");
                     $('#toastInfo').toast('show');
                 },
@@ -242,8 +236,8 @@
 
         function deleteMe(elem) {
             $(elem).closest('tr').get(0).remove();
-            $("#saveCfg").addClass("btn-warning");
-            $("#saveCfg").removeClass("btn-success");
+            $("#saveCfg").addClass("btn-outline-warning");
+            $("#saveCfg").removeClass("btn-outline-success");
         }
         
         function checkOID(inStr) {

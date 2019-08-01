@@ -18,6 +18,12 @@ python3.5 server.py
 ```
 ### TODOs
 ```
-Make the user accounts work
-Cleanup the code
+Make the user accounts mutual exclusive - Only 1 account at a time
+Test SSL/TLS
+Improve Error Reporting
+Improve Ui consistency
+Logging mechanism (use syslog?)
+Remove print messages
+Logout to End session
+Conditional publishing
 ```

@@ -5,66 +5,63 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
     <title>Cloud Profile</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarText">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">SNMP to MQTT</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-
-            <a class="nav-link" href="/dash">Dashboard</a>
-            <a class="nav-link" href="/upload">Upload</a>
-            <a class="nav-link" href="/saveDev">Devices</a>
-            <a class="nav-link" href="/saveCloud">Clouds</a>
-            <a class="nav-link" href="/saveCoordinates">Polling</a>
-
+            <li class="nav-item"><a class="nav-link" href="/dash">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="/upload">Upload</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saveDev">Devices</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saveCloud">Clouds</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saveCoordinates">Polling</a></li>
         </ul>
       </div>
     </nav>
 
-    <div class="container">
+    <div class="container-fluid">
     <br />
         <h4>Configure a Cloud Profile</h4>
             <form>
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <label for="cloudAddr"> <span class="glyphicon glyphicon-globe"></span> Broker Address</label>
+                  <label for="cloudAddr"> Broker Address</label>
                   <input class="form-control" id="cloudAddr" placeholder="Broker Address" {% if cloud[0] is defined %} value="{{ cloud[0].addr }}" {% endif %}>
                 </div>
                 <div class="form-group col-md-6">
-                  <label for="cloudPort"> <span class="glyphicon glyphicon-record"></span> Broker Port</label>
+                  <label for="cloudPort"> Broker Port</label>
                   <input class="form-control" id="cloudPort" type="number"  data-bind="value:replyNumber" placeholder="Broker Port" {% if cloud[0] is defined %} value="{{ cloud[0].port }}" {% endif %}>
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <label for="clienId">  <span class="glyphicon glyphicon-inbox"></span>  Client ID</label>
+                  <label for="clienId">  Client ID</label>
                   <input class="form-control" id="clienId" placeholder="Enter an Client ID" {% if cloud[0] is defined %} value="{{ cloud[0].clientId }}" {% endif %}>
                 </div>
                 <div class="form-group col-md-6">
-                  <label for="keepAlive">  <span class="glyphicon glyphicon-off"></span>  Keep Alive Interval (Seconds)</label>
+                  <label for="keepAlive">  Keep Alive Interval (Seconds)</label>
                   <input class="form-control" id="keepAlive" placeholder="Enter a Interval (s)" {% if cloud[0] is defined %} value="{{ cloud[0].keepAlive }}" {% endif %}>
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <label for="user"> <span class="glyphicon glyphicon-user"></span> Username</label>
+                  <label for="user"> Username</label>
                   <input class="form-control" id="user" placeholder="Username" {% if cloud[0] is defined %} value="{{ cloud[0].username }}" {% endif %}>
                 </div>
                 <div class="form-group col-md-6">
-                  <label for="pass"> <span class="glyphicon glyphicon-eye-close"></span>  Password</label>
+                  <label for="pass"> Password</label>
                   <input type="password" class="form-control" id="pass" placeholder="Password" {% if cloud[0] is defined %} value="{{ cloud[0].password }}" {% endif %}>
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-5">
-                  <label for="files"> <span class="glyphicon glyphicon-file"></span> Files</label>
+                  <label for="files"> Files</label>
                         <select class="form-control" id="files">
                             <option selected value="-- None --"> None </option>
                             {% for item in files %}
@@ -73,7 +70,7 @@
                         </select>
                 </div>
                 <div class="form-group col-md-5">
-                  <label for="CertType">  <span class="glyphicon glyphicon-pencil"></span>  Designation</label>
+                  <label for="CertType"> Designation</label>
                         <select class="form-control" id="certType">
                             <option selected value="0"> -- select an option -- </option>
                             <option value="1">CA Certificate</option>
@@ -83,31 +80,31 @@
                 </div>
                 <div class="form-group col-md-2">
                   <label for="addBtn">&nbsp</label>
-                  <button id = "addBtn" type="button" class="btn btn-success col-md-12 " onclick="setCert()">Add</button>
+                  <button id = "addBtn" type="button" class="btn btn-outline-success col-md-12 " onclick="setCert()">Add</button>
                 </div>
               </div>
 
               <div class="row">
                 <div class="col-md-4">
-                  <label> <span class="glyphicon glyphicon-bookmark"></span> Selected CA</label><br/>
+                  <label> Selected CA</label><br/>
                   <p id = "CAVal">{% if cloud[0] is defined %} {{ cloud[0].caFile }} {% else %} -- None -- {% endif %}</p>
                 </div>
                 <div class="col-md-4">
-                  <label> <span class="glyphicon glyphicon-link"></span> Selected Client Key</label><br/>
+                  <label> Selected Client Key</label><br/>
                   <p id="CKVal">{% if cloud[0] is defined %} {{ cloud[0].clientKey }} {% else %} -- None -- {% endif %}</p>
                 </div>
                 <div class="col-md-4">
-                  <label> <span class="glyphicon glyphicon-link"></span> Selected Client Cert</label><br/>
+                  <label> Selected Client Cert</label><br/>
                   <p id="CCVal" >{% if cloud[0] is defined %} {{ cloud[0].clientCert }} {% else %} -- None -- {% endif %}</p>
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="lastWillTopic"> <span class="glyphicon glyphicon-share"></span> Last Will Topic</label>
+                <label for="lastWillTopic">  Last Will Topic</label>
                 <input type="text" class="form-control" id="lastWillTopic" placeholder="Enter a Last Will Topic" {% if cloud[0] is defined %} value="{{ cloud[0].lastWillTopic }}" {% endif %}>
               </div>
               <div class="form-group">
-                <label for="lastWill"> <span class="glyphicon glyphicon-list-alt"></span> Last Will Message</label>
+                <label for="lastWill"> Last Will Message</label>
                 <input type="text" class="form-control" id="lastWillMessage" placeholder="Enter a Last Will Message" {% if cloud[0] is defined %} value="{{ cloud[0].lastWill }}" {% endif %}>
               </div>
 
@@ -115,9 +112,9 @@
               <div class="container">
                 <div class="row">
                   <div class="col text-center">
-                      <button type="button" class="btn btn-warning float-center col-5" onclick="pingCloud(this)">Test the Cloud Profile Connection</button>
+                      <button type="button" class="btn btn-outline-warning float-center col-5" onclick="pingCloud(this)">Test the Cloud Profile Connection</button>
                       <span class="col-1"></span>
-                      <button type="button" class="btn btn-success float-center col-5" type="submit" id="saveCfg">Save Configured Cloud Profile</button>
+                      <button type="button" class="btn btn-outline-warning float-center col-5" type="submit" id="saveCfg">Save Configured Cloud Profile</button>
                       </div>
                   </div>
               </div>
@@ -128,7 +125,7 @@
 
     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="errEnc">
       <div class="toast-header">
-        <strong class="mr-auto">Error!</strong>
+        <strong class="mr-auto">Info!</strong>
         <small class="text-muted"></small>
         <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -138,28 +135,12 @@
       </div>
     </div>
 
-      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="succ">
-          <div class="toast-header">
-              <strong class="mr-auto">Success!</strong>
-              <small class="text-muted"></small>
-              <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-          </div>
-          <div class="toast-body" id="successContent">
-          </div>
-      </div>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
 
-        $('.toast').toast({ delay: 10000 });
+        $('.toast').toast({ delay: 25000 });
 
         $("#saveCfg").click(function () {
             var cloudAddr = $("#cloudAddr").val();
@@ -179,15 +160,12 @@
             , caCert: caCert, clientKey: clientKey, clientCert: clientCert,
             };
 
-
-            console.log(payload);
-
             $.ajax({
                 type: 'POST',
                 url: '/saveCloud',
                 data: JSON.stringify(payload),
                 success: function (data) {
-                    $("#saveCfg").removeClass("btn-warning");
+                    $("#saveCfg").removeClass("btn-outline-warning");
                     $("#saveCfg").addClass("btn-success");
                     $("#successContent").html("All Configuration Successfully Saved.");
                     $('#succ').toast('show');
@@ -236,13 +214,11 @@
                 success: function (data) {
                     console.log(data.success);
                     if (data.success) {
-                        $(elem).removeClass("btn-warning");
+                        $(elem).removeClass("btn-outline-warning");
                         $(elem).addClass("btn-success");
                         $("#successContent").html("Ping Successful");
                         $('#succ').toast('show');
                     } else {
-                        $(elem).removeClass("btn-warning");
-                        $(elem).addClass("btn-danger");
                         $("#toastContent").html("IP Address " + ip + " Could Not Be Reached!");
                     }
                 },
