@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -33,6 +33,8 @@
                     <th scope="col">Device</th>
                     <th scope="col">Topic</th>
                     <th scope="col">Interval</th>
+                    <th scope="col">Compare Operator</th>
+                    <th scope="col">Compare To</th>
                     <th scope="col">Action</th>
 
                 </tr>
@@ -42,8 +44,9 @@
                     <td> <input type="text" id="OID" class="form-control" placeholder="Enter a OID"></td>
                     <td>
                         <select class="form-control" id="snmpOper">
-                            <option value="Get">Get</option>
-                            <option value="Get-Next">GetNext</option>
+                            <option value=0>Get</option>
+                            <option value=1>Get-Next</option>
+                            <option value=2>Get-Bulk</option>
                         </select>
                     </td>
                     <td>
@@ -55,6 +58,18 @@
                     </td>
                     <td> <div class="form-row align-items-center"><input type="text" id="topic" class="form-control" placeholder="Set a Topic"></div></td>
                     <td> <div class="form-row align-items-center"><input type="text" id="interval" class="form-control" value="30"></div></td>
+                    <td>
+                        <select class="form-control" id ="operation">
+                                <option value = "0">N/A (Always Publish)</option>
+                                <option value = "1">>= (Greater Equal)</option>
+                                <option value = "2">> (Strictly Greater)</option>
+                                <option value = "3"><= (Lesser Equal)</option>
+                                <option value = "4">< (Strictly Less)</option>
+                                <option value = "5">== (Contains)</option>
+                                <option value = "6">=== (Equals)</option>
+                        </select>
+                    </td>
+                    <td> <div class="form-row align-items-center"><input type="text" id="compareTo" class="form-control" placeholder="30 Hello"></div></td>
                     <th><button type="button" id="addDev" class="btn btn-outline-success"> Create</button></th>
 
                 </tr>
@@ -62,10 +77,12 @@
                 {% for y in coordinates %}
                 <tr>
                     <td> {{ y.oid }}</td>
-                    <td> {{ y.snmpOper }}</td>
+                    <td value={{ y.snmpOperEnum }}> {{ y.snmpOper }}</td>
                     <td> {{ y.devName }}</td>
                     <td> {{ y.topic }}</td>
                     <td> {{ y.interval }}</td>
+                    <td value = {{ y.operatorEnum }}> {{ y.operator }}</td>
+                    <td> {{ y.compareTo }}</td>
                     <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> Delete</button></td>
 
                 </tr>
@@ -104,13 +121,12 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
-        $( document ).ready(function() {
+        $(document).ready(function () {
             $.ajax({
                 type: 'GET',
                 url: '/start',
                 success: function (data) {
-                    if (data['started'])
-                    {
+                    if (data['started']) {
                         $("#polling").removeClass("btn-outline-warning");
                         $("#polling").addClass("btn-outline-success");
                     }
@@ -120,7 +136,7 @@
             });
         });
 
-        $('.toast').toast({delay: 25000}); //25 seconds
+        $('.toast').toast({ delay: 25000 }); //25 seconds
 
         $("#saveCfg").click(function () {
             var objCfg = [];
@@ -129,13 +145,15 @@
                     return; //Continue
                 }
 
+
                 $(row).children("td").each(function (i, col) {
+                    console.log(col);
                     switch (i) {
                         case 0:
                             oid = $(col).text();
                             break;
                         case 1:
-                            oper = $(col).text();
+                            oper = $(col).attr('value');
                             break;
                         case 2:
                             name = $(col).text();
@@ -146,15 +164,21 @@
                         case 4:
                             interval = $(col).text();
                             break;
+                        case 5:
+                            operator = $(col).attr('value');
+                            break;
+                        case 6:
+                            compVal = $(col).text();
+                            break;
                         default:
                             break;
                     }
                 });
-                var row = { oid: oid, oper:oper, name: name, topic: topic, interval: interval };
+                var row = { oid: oid, oper: oper, name: name, topic: topic, interval: interval, operator: operator, compareTo: compVal };
                 objCfg.push(row);
             });
 
-
+            console.log(objCfg);
             $.ajax({
                 type: 'POST',
                 url: '/saveCoordinates',
@@ -200,16 +224,71 @@
             var error = false;
             var table = $("#coordinatesTable");
             var errorStatus = "";
-
+            var oper = "";
             var OID = $("#OID").val(); //snmpOper
-            var oper = $("#snmpOper").val();
+            var operValue = $("#snmpOper").val();
+
+            switch (operValue) {
+                case ("0"):
+                    oper = "Get";
+                    break;
+                case ("1"):
+                    oper = "Get-Next";
+                    break;
+                case ("2"):
+                    oper = "Get-Bulk";
+                    break;
+                default:
+                    oper = "Error!";
+                    break;
+            }
+
             var ip = $("#ipAddr").val();
             var topic = $("#topic").val();
             var interval = $("#interval").val();
+            var operation = $("#operation").val();
+            var compareTo = $("#compareTo").val();
+            var operationLiteral = "";
+            switch (operation) {
+                case ("0"):
+                    operationLiteral = "N/A (Always Publish)";
+                    break;
+                case ("1"):
+                    operationLiteral = ">= (Greater Equal)";
+                    break;
+                case ("2"):
+                    operationLiteral = "> (Strictly Greater)";
+                    break;
+                case ("3"):
+                    operationLiteral = "<= (Lesser Equal)";
+                    break;
+                case ("4"):
+                    operationLiteral = "< (Strictly Lesser)";
+                    break;
+                case ("5"):
+                    operationLiteral = "== (Contains)";
+                    break;
+                case ("6"):
+                    operationLiteral = "=== (Equals)";
+                    break;
+                default:
+                    operationLiteral = "Error!";
+                    break;
+            }
+
+            if (operation == "0" && compareTo.length > 0) {
+                error = true;
+                errorStatus = "<li>Cannot Compare To Without an Compare Operator!</li>"
+            }
+
+            if (operation != "0" && compareTo.length < 1) {
+                error = true;
+                errorStatus = "<li>Cannot Compare To Empty!</li>"
+            }
 
             if (!checkOID(OID)) {
                 error = true;
-                errorStatus = "<li>OID is Not Valid!</li>"
+                errorStatus += "<li>OID is Not Valid!</li>"
             }
 
             if (!checkTopic(topic)) {
@@ -219,7 +298,7 @@
 
             if (!checkinterval(interval)) {
                 error = true;
-                errorStatus += "<li>Internal is Not Valid, It Must Be a Number!</li>"
+                errorStatus += "<li>Interval is Not Valid, It Must Be a Number!</li>"
             }
 
             if (error) {
@@ -228,7 +307,15 @@
                 return;
             }
 
-            table.append('<tr><td>' + OID + '</td><td>' + oper + ' </td><td>' + ip + ' </td><td>' + topic + '</td><td>' + interval + '</td><td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> Delete</button></td></tr>');
+            if (operation == "0") {
+                compareTo = "Not Used";
+            }
+
+            table.append('<tr><td>' + OID + '</td><td value =' + operValue + '>' + oper +
+                ' </td><td>' + ip + ' </td><td>' + topic + '</td><td>' + interval +
+                '</td><td value=' + operation + '>' + operationLiteral + '</td><td>' + compareTo +
+                '</td><td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> Delete</button></td></tr>');
+
             $("#saveCfg").addClass("btn-outline-warning");
             $("#saveCfg").removeClass("btn-success");
 
@@ -239,7 +326,7 @@
             $("#saveCfg").addClass("btn-outline-warning");
             $("#saveCfg").removeClass("btn-outline-success");
         }
-        
+
         function checkOID(inStr) {
             return RegExp("^([1-9][0-9]{0,3}|0)(\.([1-9][0-9]{0,3}|0)){1,13}$").test(inStr);
         }
@@ -248,7 +335,7 @@
             return (!(/\s/.test(inStr)) && inStr.length > 1)
         }
 
-        function checkinterval(interval){
+        function checkinterval(interval) {
             return !isNaN(interval);
         }
 
