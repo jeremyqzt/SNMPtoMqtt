@@ -60,15 +60,6 @@
                     <td> <div class="form-row align-items-center"><input type="text" id="interval" class="form-control" value="30"></div></td>
                     <td>
                         <select class="form-control" id ="operation">
-<<<<<<< HEAD
-                                <option value = "0">N/A (Always Publish)</option>
-                                <option value = "1">>= (Greater Equal)</option>
-                                <option value = "2">> (Strictly Greater)</option>
-                                <option value = "3"><= (Lesser Equal)</option>
-                                <option value = "4">< (Strictly Less)</option>
-                                <option value = "5">== (Contains)</option>
-                                <option value = "6">=== (Equals)</option>
-=======
                                 <option value = "0">Publish Different</option>
                                 <option value = "1">Publish Same</option>
                                 <option value = "2">Always Publish</option>
@@ -78,7 +69,7 @@
                                 <option value = "6">< (Strictly Less)</option>
                                 <option value = "7">== (Contains)</option>
                                 <option value = "8">=== (Equals)</option>
->>>>>>> conditional publishing
+
                         </select>
                     </td>
                     <td> <div class="form-row align-items-center"><input type="text" id="compareTo" class="form-control" placeholder="30 Hello"></div></td>
@@ -89,21 +80,12 @@
                 {% for y in coordinates %}
                 <tr>
                     <td> {{ y.oid }}</td>
-<<<<<<< HEAD
-                    <td value={{ y.snmpOperEnum }}> {{ y.snmpOper }}</td>
-                    <td> {{ y.devName }}</td>
-                    <td> {{ y.topic }}</td>
-                    <td> {{ y.interval }}</td>
-                    <td value = {{ y.operatorEnum }}> {{ y.operator }}</td>
-                    <td> {{ y.compareTo }}</td>
-=======
                     <td value={{ y.snmpOper }}> {{ y.snmpOperText }}</td>
                     <td> {{ y.devName }}</td>
                     <td> {{ y.topic }}</td>
                     <td> {{ y.interval }}</td>
                     <td value = {{ y.operEnum }}> {{ y.operEnumText }}</td>
                     <td> {{ y.compare }}</td>
->>>>>>> conditional publishing
                     <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> Delete</button></td>
 
                 </tr>
@@ -142,16 +124,13 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
-<<<<<<< HEAD
-        $(document).ready(function () {
-=======
+
         $(document).on('change', '#operation', function () {
             checkEnable();
         });
 
         $(document).ready(function () {
             checkEnable();
->>>>>>> conditional publishing
             $.ajax({
                 type: 'GET',
                 url: '/start',
@@ -204,11 +183,9 @@
                             break;
                     }
                 });
-<<<<<<< HEAD
-                var row = { oid: oid, oper: oper, name: name, topic: topic, interval: interval, operator: operator, compareTo: compVal };
-=======
+
                 var row = { oid: oid, oper: oper, name: name, topic: topic, interval: interval, operatorEnum: operator, operatorCompare: compVal };
->>>>>>> conditional publishing
+
                 objCfg.push(row);
             });
 
@@ -282,28 +259,6 @@
             var operation = $("#operation").val();
             var compareTo = $("#compareTo").val();
             var operationLiteral = "";
-<<<<<<< HEAD
-            switch (operation) {
-                case ("0"):
-                    operationLiteral = "N/A (Always Publish)";
-                    break;
-                case ("1"):
-                    operationLiteral = ">= (Greater Equal)";
-                    break;
-                case ("2"):
-                    operationLiteral = "> (Strictly Greater)";
-                    break;
-                case ("3"):
-                    operationLiteral = "<= (Lesser Equal)";
-                    break;
-                case ("4"):
-                    operationLiteral = "< (Strictly Lesser)";
-                    break;
-                case ("5"):
-                    operationLiteral = "== (Contains)";
-                    break;
-                case ("6"):
-=======
 
             switch (operation) {
                 case ("0"):
@@ -331,7 +286,6 @@
                     operationLiteral = "== (Contains)";
                     break;
                 case ("8"):
->>>>>>> conditional publishing
                     operationLiteral = "=== (Equals)";
                     break;
                 default:
@@ -339,20 +293,10 @@
                     break;
             }
 
-<<<<<<< HEAD
-            if (operation == "0" && compareTo.length > 0) {
-                error = true;
-                errorStatus = "<li>Cannot Compare To Without an Compare Operator!</li>"
-            }
 
-            if (operation != "0" && compareTo.length < 1) {
-                error = true;
-                errorStatus = "<li>Cannot Compare To Empty!</li>"
-=======
             if (operation > "2" && compareTo.length < 1) {
                 error = true;
                 errorStatus += "<li>Cannot Compare To Empty!</li>"
->>>>>>> conditional publishing
             }
 
             if (!checkOID(OID)) {
@@ -381,11 +325,8 @@
                 return;
             }
 
-<<<<<<< HEAD
-            if (operation == "0") {
-=======
+
             if (operation <= "2") {
->>>>>>> conditional publishing
                 compareTo = "Not Used";
             }
 
