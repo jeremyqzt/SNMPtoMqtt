@@ -41,8 +41,8 @@
               <td> <input type="text" id="devName" class="form-control" placeholder="Give this device a Name"></td>
               <td> <input type="text" id="devIp" class="form-control" placeholder="Enter IP Address"></td>
               <td> <input type="text" id="devPort" class="form-control" placeholder="Enter a Port"></td>
-              <th><button type="button" class="btn btn-outline-secondary" disabled> <span class="glyphicon glyphicon-flash"></span>  Ping</button></th>
-              <th><button type="button" id="addDev" class="btn btn-outline-success"> <span class="glyphicon glyphicon-plus"></span>  Create</button></th>
+              <th><button type="button" class="btn btn-outline-secondary" disabled> Ping</button></th>
+              <th><button type="button" id="addDev" class="btn btn-outline-success"> Create</button></th>
               <th>Unattempted</th>
             </tr>
 
@@ -53,7 +53,7 @@
                   <td>{{ x.port }} </td>
                   <td><button type="button" onclick="ping(this, '{{ x.addr }}' , '{{ x.port }}')" id="ping" class="btn btn-outline-warning">Ping</button></td>
 
-                  <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> <span class="glyphicon glyphicon-minus"></span>  Delete</button></td>
+                  <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> Delete</button></td>
                   <td id="ping{{ x.addr }}-{{ x.port }}">Unattempted</td>
               </tr>
             {% endfor %}
