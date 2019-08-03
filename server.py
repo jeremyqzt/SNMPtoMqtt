@@ -7,8 +7,11 @@ import socket
 import threading
 import threadLoop
 import paho.mqtt.client as paho
-from werkzeug import secure_filename
 import ssl
+import platform
+import subprocess
+from werkzeug import secure_filename
+
 
 certPath = "certs"
 app = Flask(__name__)
@@ -19,7 +22,10 @@ userSession = ""
 mqttClient = None
 cloudAddressStr = "Unattempted"
 flag_connected = "Unattempted"
-
+snmpTextEnum = ["Get", "Get-Next"]
+compareTextEnum = ["Publish Different", "Publish Same", "Always Publish"
+               , ">= (Greater Equal)", "> (Strictly Greater)", "<= (Lesser Equal)"
+               , "< (Strictly Lesser)", "== (Contains)", "=== (Equals)"]
 
 def on_connect(client, userdata, flags, rc):
     pahoStatus = ["Successful", "Incorrect Protocol Version", "Invalid Client ID", "Server Unavailable", "Bad Credentials", "Not Authorized"]
@@ -52,14 +58,9 @@ def stopAll():
     mqttClient = None
 
 def ping(ip, port):
-    print(ip + port)
-    response = os.system("ping -c 1 " + ip)
-
-
-    if response == 0:
-        return True
-    else:
-        return False
+    param = '-n' if platform.system().lower()=='windows' else '-c'
+    command = ['ping', param, '1', ip]
+    return subprocess.call(command) == 0
 
 @app.route('/')
 def home():
@@ -96,7 +97,8 @@ def saveCloud():
       conn.commit()
       print(data)
       conn.execute(sql, (data['cloudAddr'], data['cloudPort'], data['lastWillMessage'], data['lastWillTopic'],
-                         data['username'],data['password'], data['clientId'],data['keepAlive'], data['clientCert'],data['caCert'],data['clientKey']))
+                         data['username'],data['password'], data['clientId'],data['keepAlive'], data['clientCert'],
+                         data['caCert'],data['clientKey']))
 
       conn.commit()
       return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
@@ -169,19 +171,23 @@ def saveCoordinates():
    if not session.get('logged_in'):
       return render_template('login.html')
 
+
    if request.method == 'POST':
       stopAll()
       data = request.get_json()
       conn = sqlite3.connect('database.db')
       conn.execute('DELETE FROM coordinates;')
-      sql = ' INSERT INTO coordinates(oid, devName ,snmpOper, topic, interval) VALUES(?,?,?,?,?) '
+      sql = ' INSERT INTO coordinates(oid, devName ,snmpOper, topic, interval, operEnum, compare) VALUES(?,?,?,?,?,?,?)'
       for i in data:
             oid = i['oid'].strip()
-            oper = i['oper'].strip()
+            snmpEnum = int(i['oper'].strip())
             interval = i['interval'].strip()
             topic = i['topic'].strip()
             name = i['name'].strip()
-            conn.execute(sql, (oid, name, oper, topic, interval))
+            operationEnum = int(i['operatorEnum'].strip())
+            operText = i['operatorCompare'].strip()
+            
+            conn.execute(sql, (oid, name, snmpEnum, topic, interval, operationEnum, operText))
 
       conn.commit()
       conn.close()
@@ -189,6 +195,7 @@ def saveCoordinates():
       return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
    if request.method == 'GET':
+      global snmpTextEnum, compareTextEnum
       conn = sqlite3.connect('database.db')
       conn.row_factory = sqlite3.Row
       cursor = conn.execute("SELECT * FROM devices;")
@@ -198,7 +205,10 @@ def saveCoordinates():
       cursor = conn.execute("SELECT * FROM coordinates;")
       rows = cursor.fetchall()
       coordinates = [dict(ix) for ix in rows]
-
+      for i in coordinates:
+          i["snmpOperText"] = snmpTextEnum[int(i["snmpOper"])]
+          i["operEnumText"] = compareTextEnum[int(i["operEnum"])]
+      print(coordinates)
       conn.close()
 
       return render_template('coordinate.html', devices=dev, coordinates=coordinates)
@@ -303,6 +313,11 @@ def do_admin_login():
     session['logged_in'] = True
     return redirect(url_for('dash'))
 
+@app.route("/logout")
+def logout():
+    session['logged_in'] = False
+    return home()
+
 if __name__ == "__main__":
    app.secret_key = os.urandom(12)
    conn = sqlite3.connect('database.db')
@@ -314,7 +329,7 @@ if __name__ == "__main__":
 
 
    conn.execute("CREATE TABLE IF NOT EXISTS coordinates (oid TEXT, devName TEXT,"
-                "snmpOper TEXT, topic TEXT, interval TEXT);")
+                "snmpOper INTEGER, topic TEXT, interval TEXT, operEnum INTEGER,compare TEXT);")
    conn.commit()
    conn.close()
    

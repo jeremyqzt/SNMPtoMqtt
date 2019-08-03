@@ -23,7 +23,10 @@ class pollThread (threading.Thread):
 
         self.SnmpIp = southCfg['addr']
         self.SnmpPort = int(southCfg['port'])
-        self.SnmpOper = southCfg['snmpOper']
+        self.SnmpOper = int(southCfg['snmpOper'])
+        self.compareOper = int(southCfg['operEnum'])
+        self.compareTo = southCfg['compare']
+
         self.community = "public"
         self.OID = southCfg['oid']
 
@@ -44,15 +47,19 @@ class pollThread (threading.Thread):
         self.SnmpAgent = mysnmp.mqttSNMP(self.SnmpIp, self.SnmpPort)
 
         self.mqttClient = mqtt
+        self.oldSnmpResp = None
 
         self.running = True
         self.data = {}
         self.JSONdata = None
+        self.lastPublish = ""
+
     def run(self):
 
         while (self.running):
             self._poll()
-            self._send()
+            if (self._compare()):
+                self._send()
 
             for i in range(self.delay):
                 time.sleep(1)
@@ -77,17 +84,45 @@ class pollThread (threading.Thread):
         return self.SnmpResp
 
     def _poll(self):
-        if (self.SnmpOper == "Get"):
+        if (self.SnmpOper == 0):
             self.SnmpResp = self.SnmpAgent.get(self.OID, self.community)
-        else:
+        elif (self.SnmpOper == 1):
             self.SnmpResp = self.SnmpAgent.getNext(self.OID, self.community)
 
         self.SnmpResp['Topic'] = self.topic #add topic back
+        self.SnmpResp['Publish'] = self.lastPublish
         self.JSONdata = json.dumps(self.SnmpResp)
 
     def _send(self):
-        self.SnmpResp['Publish'] = ("%s" % datetime.datetime.now())
+        self.lastPublish = ("%s" % datetime.datetime.now())
+        self.SnmpResp['Publish'] = self.lastPublish
         self.JSONdata = json.dumps(self.SnmpResp)
+
+        self.oldSnmpResp = self.SnmpResp
         self.mqttClient.publish(self.topic, self.JSONdata)
+
+    def _compare(self):
+        compareOper = self.compareOper
+        if self.oldSnmpResp is None: #First Publish
+            return True
+
+        if (compareOper == 0):
+            return true if self.SnmpResp['Value'] != self.oldSnmpResp['Value'] else False
+        if (compareOper == 1):
+            return True if self.SnmpResp['Value'] == self.oldSnmpResp['Value'] else False
+        if (compareOper == 2):
+            return True
+        if (compareOper == 3):
+            return True if self.SnmpResp['Value'] >= self.oldSnmpResp['Value']  else False
+        if (compareOper == 4):
+            return True if self.SnmpResp['Value'] > self.oldSnmpResp['Value']  else False
+        if (compareOper == 5):
+            return True if self.SnmpResp['Value'] <= self.oldSnmpResp['Value']  else False
+        if (compareOper == 6):
+            return True if self.SnmpResp['Value'] < self.oldSnmpResp['Value']  else False
+        if (compareOper == 7):
+            return True if self.SnmpResp['Value'].contains(self.compareTo)  else False
+        if (compareOper == 8):
+            return True if self.SnmpResp['Value'] == self.compareTo  else False
 
 

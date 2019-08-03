@@ -4,14 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-
-
     <title>Polling</title>
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="#">SNMP to MQTT</a>
+      <a class="navbar-brand" href="/dash">SNMP to MQTT</a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item"><a class="nav-link" href="/dash">Dashboard</a></li>
@@ -21,6 +19,9 @@
             <li class="nav-item"><a class="nav-link" href="/saveCoordinates">Polling</a></li>
         </ul>
       </div>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="nav-item"><a class="nav-link" href="/logout">End Session</a></li>
+      </ul>
     </nav>
     <div class="container-fluid">
         <br />
@@ -36,7 +37,6 @@
                     <th scope="col">Compare Operator</th>
                     <th scope="col">Compare To</th>
                     <th scope="col">Action</th>
-
                 </tr>
             </thead>
             <tbody id="coordinatesTable">
@@ -46,13 +46,13 @@
                         <select class="form-control" id="snmpOper">
                             <option value=0>Get</option>
                             <option value=1>Get-Next</option>
-                            <option value=2>Get-Bulk</option>
+                            <!--<option value=2>Get-Bulk</option> No Get-Bulk For Now!-->
                         </select>
                     </td>
                     <td>
-                        <select class="form-control">
+                        <select class="form-control" id ="ipAddr">
                             {% for x in devices %}
-                                <option id ="ipAddr" value = "{{ x.name }}">{{ x.addr }}({{ x.name  }})</option>
+                                <option value = "{{ x.name }}">{{ x.addr }}({{ x.name  }})</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -60,6 +60,7 @@
                     <td> <div class="form-row align-items-center"><input type="text" id="interval" class="form-control" value="30"></div></td>
                     <td>
                         <select class="form-control" id ="operation">
+<<<<<<< HEAD
                                 <option value = "0">N/A (Always Publish)</option>
                                 <option value = "1">>= (Greater Equal)</option>
                                 <option value = "2">> (Strictly Greater)</option>
@@ -67,6 +68,17 @@
                                 <option value = "4">< (Strictly Less)</option>
                                 <option value = "5">== (Contains)</option>
                                 <option value = "6">=== (Equals)</option>
+=======
+                                <option value = "0">Publish Different</option>
+                                <option value = "1">Publish Same</option>
+                                <option value = "2">Always Publish</option>
+                                <option value = "3">>= (Greater Equal)</option>
+                                <option value = "4">> (Strictly Greater)</option>
+                                <option value = "5"><= (Lesser Equal)</option>
+                                <option value = "6">< (Strictly Less)</option>
+                                <option value = "7">== (Contains)</option>
+                                <option value = "8">=== (Equals)</option>
+>>>>>>> conditional publishing
                         </select>
                     </td>
                     <td> <div class="form-row align-items-center"><input type="text" id="compareTo" class="form-control" placeholder="30 Hello"></div></td>
@@ -77,12 +89,21 @@
                 {% for y in coordinates %}
                 <tr>
                     <td> {{ y.oid }}</td>
+<<<<<<< HEAD
                     <td value={{ y.snmpOperEnum }}> {{ y.snmpOper }}</td>
                     <td> {{ y.devName }}</td>
                     <td> {{ y.topic }}</td>
                     <td> {{ y.interval }}</td>
                     <td value = {{ y.operatorEnum }}> {{ y.operator }}</td>
                     <td> {{ y.compareTo }}</td>
+=======
+                    <td value={{ y.snmpOper }}> {{ y.snmpOperText }}</td>
+                    <td> {{ y.devName }}</td>
+                    <td> {{ y.topic }}</td>
+                    <td> {{ y.interval }}</td>
+                    <td value = {{ y.operEnum }}> {{ y.operEnumText }}</td>
+                    <td> {{ y.compare }}</td>
+>>>>>>> conditional publishing
                     <td><button onclick="deleteMe(this)" class="btn btn-outline-danger" type="button"> Delete</button></td>
 
                 </tr>
@@ -121,7 +142,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
+<<<<<<< HEAD
         $(document).ready(function () {
+=======
+        $(document).on('change', '#operation', function () {
+            checkEnable();
+        });
+
+        $(document).ready(function () {
+            checkEnable();
+>>>>>>> conditional publishing
             $.ajax({
                 type: 'GET',
                 url: '/start',
@@ -174,7 +204,11 @@
                             break;
                     }
                 });
+<<<<<<< HEAD
                 var row = { oid: oid, oper: oper, name: name, topic: topic, interval: interval, operator: operator, compareTo: compVal };
+=======
+                var row = { oid: oid, oper: oper, name: name, topic: topic, interval: interval, operatorEnum: operator, operatorCompare: compVal };
+>>>>>>> conditional publishing
                 objCfg.push(row);
             });
 
@@ -219,7 +253,6 @@
             });
         });
 
-
         $("#addDev").click(function () {
             var error = false;
             var table = $("#coordinatesTable");
@@ -249,6 +282,7 @@
             var operation = $("#operation").val();
             var compareTo = $("#compareTo").val();
             var operationLiteral = "";
+<<<<<<< HEAD
             switch (operation) {
                 case ("0"):
                     operationLiteral = "N/A (Always Publish)";
@@ -269,6 +303,35 @@
                     operationLiteral = "== (Contains)";
                     break;
                 case ("6"):
+=======
+
+            switch (operation) {
+                case ("0"):
+                    operationLiteral = "Publish Different";
+                    break;
+                case ("1"):
+                    operationLiteral = "Publish Same";
+                    break;
+                case ("2"):
+                    operationLiteral = "Always Publish";
+                    break;
+                case ("3"):
+                    operationLiteral = ">= (Greater Equal)";
+                    break;
+                case ("4"):
+                    operationLiteral = "> (Strictly Greater)";
+                    break;
+                case ("5"):
+                    operationLiteral = "<= (Lesser Equal)";
+                    break;
+                case ("6"):
+                    operationLiteral = "< (Strictly Lesser)";
+                    break;
+                case ("7"):
+                    operationLiteral = "== (Contains)";
+                    break;
+                case ("8"):
+>>>>>>> conditional publishing
                     operationLiteral = "=== (Equals)";
                     break;
                 default:
@@ -276,6 +339,7 @@
                     break;
             }
 
+<<<<<<< HEAD
             if (operation == "0" && compareTo.length > 0) {
                 error = true;
                 errorStatus = "<li>Cannot Compare To Without an Compare Operator!</li>"
@@ -284,6 +348,11 @@
             if (operation != "0" && compareTo.length < 1) {
                 error = true;
                 errorStatus = "<li>Cannot Compare To Empty!</li>"
+=======
+            if (operation > "2" && compareTo.length < 1) {
+                error = true;
+                errorStatus += "<li>Cannot Compare To Empty!</li>"
+>>>>>>> conditional publishing
             }
 
             if (!checkOID(OID)) {
@@ -294,6 +363,11 @@
             if (!checkTopic(topic)) {
                 error = true;
                 errorStatus += "<li>Topic is Not Valid, It Cannot Contain Spaces!</li>"
+            }
+
+            if (ip === "undefined" || ip == null) {
+                error = true;
+                errorStatus += "<li>IP Address is Not Valid, It Cannot be Empty</li>"
             }
 
             if (!checkinterval(interval)) {
@@ -307,7 +381,11 @@
                 return;
             }
 
+<<<<<<< HEAD
             if (operation == "0") {
+=======
+            if (operation <= "2") {
+>>>>>>> conditional publishing
                 compareTo = "Not Used";
             }
 
@@ -339,6 +417,15 @@
             return !isNaN(interval);
         }
 
+        function checkEnable() {
+            var operation = $("#operation").val();
+            var compareTo = $("#compareTo");
+            if (operation <= "2") {
+                compareTo.prop('disabled', true);
+            } else {
+                compareTo.prop('disabled', false);
+            }
+        }
     </script>
 
 </body>

@@ -24,6 +24,6 @@ Improve Error Reporting
 Improve Ui consistency
 Logging mechanism (use syslog?)
 Remove print messages
-Logout to End session
-Conditional publishing
+Logout to End session (DONE)
+Conditional publishing (DONE)
 ```
