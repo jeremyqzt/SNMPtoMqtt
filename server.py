@@ -95,7 +95,7 @@ def saveCloud():
       conn = sqlite3.connect('database.db')
       conn.execute('DELETE FROM cloudProfile;')
       conn.commit()
-      print(data)
+      #print(data)
       conn.execute(sql, (data['cloudAddr'], data['cloudPort'], data['lastWillMessage'], data['lastWillTopic'],
                          data['username'],data['password'], data['clientId'],data['keepAlive'], data['clientCert'],
                          data['caCert'],data['clientKey']))
@@ -161,7 +161,7 @@ def saveDev():
       cursor = conn.execute("SELECT * FROM devices;")
       rows = cursor.fetchall()
       dev = [dict(ix) for ix in rows]
-      print(dev)
+      #print(dev)
       conn.close()
 
       return render_template('devices.html', devices=dev)
@@ -208,7 +208,7 @@ def saveCoordinates():
       for i in coordinates:
           i["snmpOperText"] = snmpTextEnum[int(i["snmpOper"])]
           i["operEnumText"] = compareTextEnum[int(i["operEnum"])]
-      print(coordinates)
+      #print(coordinates)
       conn.close()
 
       return render_template('coordinate.html', devices=dev, coordinates=coordinates)
