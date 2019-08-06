@@ -11,7 +11,7 @@ import ssl
 import platform
 import subprocess
 from werkzeug import secure_filename
-
+import logging
 
 certPath = "certs"
 app = Flask(__name__)
@@ -26,6 +26,7 @@ snmpTextEnum = ["Get", "Get-Next"]
 compareTextEnum = ["Publish Different", "Publish Same", "Always Publish"
                , ">= (Greater Equal)", "> (Strictly Greater)", "<= (Lesser Equal)"
                , "< (Strictly Lesser)", "== (Contains)", "=== (Equals)"]
+log = logging.getLogger(__name__)
 
 def on_connect(client, userdata, flags, rc):
     pahoStatus = ["Successful", "Incorrect Protocol Version", "Invalid Client ID", "Server Unavailable", "Bad Credentials", "Not Authorized"]
@@ -44,7 +45,7 @@ def on_disconnect(client, userdata, rc):
 
 def stopAll():
     global mqttClient
-
+    log.info(("Stopping polling"))
     for pollThread in runningListCoor:
         pollThread.setRunning(False)
 
@@ -95,7 +96,7 @@ def saveCloud():
       conn = sqlite3.connect('database.db')
       conn.execute('DELETE FROM cloudProfile;')
       conn.commit()
-      #print(data)
+      log.info(("Cloud to Save: %s" % data))
       conn.execute(sql, (data['cloudAddr'], data['cloudPort'], data['lastWillMessage'], data['lastWillTopic'],
                          data['username'],data['password'], data['clientId'],data['keepAlive'], data['clientCert'],
                          data['caCert'],data['clientKey']))
@@ -112,6 +113,7 @@ def saveCloud():
       onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
 
       conn.close()
+      log.info(("cloud data being read: %s" % cloudData))
       if (cloudData):
          return render_template('clouds.html', cloud=cloudData, files=map(json.dumps, onlyfiles), filesCa=map(json.dumps, onlyfiles))
       else:
@@ -130,7 +132,6 @@ def upload():
       return redirect(url_for('upload'))
 
    if request.method == 'GET':
-
       onlyfiles = [f for f in os.listdir(certPath) if isfile(join(certPath, f))]
       return render_template('upload.html', files=map(json.dumps, onlyfiles))
 
@@ -146,6 +147,7 @@ def saveDev():
       conn = sqlite3.connect('database.db')
       conn.execute('DELETE FROM devices;')
       sql = ' INSERT INTO devices(name,addr,port) VALUES(?,?,?) '
+      log.info(("Devices to Save: %s" % data))
       for i in data:
             name = i['name'].strip()
             ip = i['ip'].strip()
@@ -161,7 +163,7 @@ def saveDev():
       cursor = conn.execute("SELECT * FROM devices;")
       rows = cursor.fetchall()
       dev = [dict(ix) for ix in rows]
-      #print(dev)
+      log.info(("getting devices %s" % dev))
       conn.close()
 
       return render_template('devices.html', devices=dev)
@@ -178,6 +180,10 @@ def saveCoordinates():
       conn = sqlite3.connect('database.db')
       conn.execute('DELETE FROM coordinates;')
       sql = ' INSERT INTO coordinates(oid, devName ,snmpOper, topic, interval, operEnum, compare) VALUES(?,?,?,?,?,?,?)'
+
+
+      log.info(("Coordinates to Save: %s" % data))
+
       for i in data:
             oid = i['oid'].strip()
             snmpEnum = int(i['oper'].strip())
@@ -208,7 +214,7 @@ def saveCoordinates():
       for i in coordinates:
           i["snmpOperText"] = snmpTextEnum[int(i["snmpOper"])]
           i["operEnumText"] = compareTextEnum[int(i["operEnum"])]
-      #print(coordinates)
+      log.info(("Coordinates: %s" % coordinates))
       conn.close()
 
       return render_template('coordinate.html', devices=dev, coordinates=coordinates)
@@ -261,30 +267,35 @@ def engage():
 
             cloudAddressStr = theCloud['addr'] + ":" + theCloud['port']
             ########END TODO
-
+            log.info(("Cloud: %s" % theCloud))
 
             i = 0
             #Start New ones
             for coordinate in coordinates:
                 worker = threadLoop.pollThread(str(i), json.dumps(coordinate), json.dumps(theCloud), mqttClient)
+                log.info(("Starting Thread: %s" % coordinate))
                 worker.start()
                 runningListCoor.append(worker)
                 i = i + 1
 
         else:
+            log.info("Stopping polling")
             stopAll()
 
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
     if request.method == 'GET':
         pointsLoaded = len(runningListCoor) > 0
+        log.info(("pointsLoaded on GET: %s" % pointsLoaded))
         return json.dumps({'success':True, 'started': pointsLoaded}), 200, {'ContentType':'application/json'}
 
 
 @app.route('/ping', methods=['POST'])
 def pingDev():
+
    if request.method == 'POST':
       ipToPing = request.get_json()
+      log.info(("To Ping!: %s" % ipToPing))
       if (ping(ipToPing['ip'], ipToPing['port'])):
             return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
       else:
@@ -302,6 +313,8 @@ def dash():
         item = t.SnmpResp
         pointsStatus.append(item)
 
+    log.info(("pointsStatus: %s" % pointsStatus))
+    log.info(("cloudStatus: %s" % cloudStatus))
 
     return render_template('dash.html', connected = cloudStatus, points = pointsStatus)
 
@@ -319,6 +332,7 @@ def logout():
     return home()
 
 if __name__ == "__main__":
+   logging.basicConfig(level=logging.INFO, filename="SnmpMQTT.log")
    app.secret_key = os.urandom(12)
    conn = sqlite3.connect('database.db')
    conn.execute('CREATE TABLE IF NOT EXISTS devices (name TEXT, addr TEXT, port TEXT)')
@@ -332,7 +346,10 @@ if __name__ == "__main__":
                 "snmpOper INTEGER, topic TEXT, interval TEXT, operEnum INTEGER,compare TEXT);")
    conn.commit()
    conn.close()
-   
+
+   log.info("Application Started")
+
    if not os.path.exists(certPath):
       os.mkdir(certPath)
+      log.info("Created: " + certPath)
    app.run(debug=True,host='0.0.0.0', port=4000)
